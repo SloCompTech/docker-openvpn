@@ -1,0 +1,73 @@
+#!/bin/bash
+
+#
+# OpenVPN init script
+#
+# @see https://community.openvpn.net/openvpn/wiki/EasyRSA3-OpenVPN-Howto
+# @see https://forums.openvpn.net/viewtopic.php?t=20837
+# @see https://securitronlinux.com/bejiitaswrath/how-to-create-keys-with-easy-rsa-without-a-password-prompt/
+#
+#   Usage: ovpn_init [nopass]
+#
+#
+
+# User permission fix
+if [ "$USER" != "abc" ]; then
+    RUNAS="sudo -E -u abc"
+else
+    RUNAS=""
+fi
+
+#
+# Init CA
+#
+if [ -e "$OVPN_ROOT/pki" ] && [ ! -n "$OVPN_INIT_PKI"]; then
+    echo "PKI directory already exists. Are you SURE to init PKI again ?"
+    echo "You will LOSE all files in your PKI."
+    echo -n "[y/N]:"
+    read decission
+    if [ $decission == "y" ] || [ $decission == "Y" ]; then
+        # Delete PKI
+        rm -rf $EASYRSA_PKI
+    else
+        # Abort
+        exit 0
+    fi
+else
+    echo "CA settings are located in $EASYRSA_VARS_FILE"
+    echo "Did you modified the file or are you planing to enter values interactively ?"
+    echo -n "[y/N]:"
+    read decission
+    if [ $decission != "y" ] && [ $decission != "Y" ]; then
+        echo "Please edit $EASYRSA_VARS_FILE"
+        exit 0
+    fi
+fi
+
+# Init PKI directory
+$RUNAS easyrsa init-pki
+
+# Build dh.pem
+$RUNAS easyrsa gen-dh
+
+# Build CA
+echo "Now it will build CA files for issuing new certifiactes"
+echo "Please protect ca.key with secure password (used for signing new certs)"
+echo "ca.key is needed only for signing new certificates, not for OpenVPN to work"
+
+if [ $# -gt 0 ] && [ $1 == "nopass" ]; then
+    $RUNAS easyrsa build-ca nopass
+else
+    $RUNAS easyrsa build-ca
+fi
+
+# Build server key
+$RUNAS easyrsa build-server-full server nopass
+$RUNAS easyrsa sign-req server server
+rm $EASYRSA_PKI/reqs/server.req
+
+# Generate ta.key (for tls-auth,tls-crypt)
+$RUNAS openvpn --genkey --secret $EASYRSA_PKI/ta.key
+
+# Generate CRL
+$RUNAS easyrsa gen-crl

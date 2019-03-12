@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#
+# Modify routing without root user
+#
+sudo /sbin/ip $*

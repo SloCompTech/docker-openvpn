@@ -1,0 +1,103 @@
+#!/bin/bash
+
+#
+# OpenVPN client configuration generator
+#
+
+source /app/lib/utils
+
+# User permission fix
+if [ "$USER" != "abc" ]; then
+    RUNAS="sudo -E -u abc"
+else
+    RUNAS=""
+fi
+
+function usage() {
+    echo "Usage: ovpn_client COMMAND [ARGS]"
+    echo ""
+    echo "Commands:"
+    echo "  add [NAME [nopass]]             # Creates certificates for client"
+    echo "  ovpn NAME                       # Builds .ovpn file"
+    echo "  revoke|ban|delete|remove NAME   # Removes client"
+}
+
+function build_ovpn() {
+    if [ $# -gt 0 ]; then
+        # Client standard config
+        for file in $OVPN_ROOT/openvpn/client/*.conf
+        do
+            [ -e "$file" ] || continue
+            cat $file
+        done
+
+        # CA
+        echo "<ca>"
+        cat $EASYRSA_PKI/ca.crt
+        echo "</ca>"
+        echo ""
+        
+        # Client certs
+        echo "<cert>"
+        cat $EASYRSA_PKI/issued/$1.crt
+        echo "</cert>"
+
+        # Client key
+        echo "<key>"
+        cat $EASYRSA_PKI/private/$1.key
+        echo "</key>"
+
+        # tls-crypt
+        echo "<tls-crypt>"
+        cat $EASYRSA_PKI/ta.key
+        echo "</tls-crypt>"
+    fi
+}
+
+# Check if command even set
+if [ $# -lt 1 ]; then
+    # Invalid command
+    usage
+    exit 1
+fi
+
+if [ "$1" = "add" ]; then
+    if [ $# -eq 1 ]; then
+        # Cert guide
+        read -p "Common name:" CN
+        echo -n "Password protect "
+        P=$(yn)
+        if [ $P -eq 0 ]; then
+            $RUNAS easyrsa gen-req $CN nopass
+        else
+            $RUNAS easyrsa gen-req $CN
+        fi
+        $RUNAS easyrsa sign-req client $CN
+    else
+        # Just build cert
+        $RUNAS easyrsa gen-req ${@:2}
+        $RUNAS easyrsa sign-req client ${@:2}
+    fi
+    
+elif [ "$1" = "ovpn" ]; then
+    if [ $# -eq 2 ]; then
+        build_ovpn $2
+    else
+        usage
+        exit 1
+    fi
+elif [ "$1" = "ban" ] || [ "$1" = "remove" ] || [ "$1" = "delete"] || [ "$1" = "revoke" ] ; then
+    if [ $# -eq 2 ]; then
+        $RUNAS easyrsa revoke $2
+        $RUNAS easyrsa gen-crl
+    else
+        usage
+        exit 1
+    fi
+else
+    usage
+    exit 1
+fi
+
+
+

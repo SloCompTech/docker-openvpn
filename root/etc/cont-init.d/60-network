@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#
+#   Network setup
+#
+
+# Setup tunnel driver
+if [ ! -d "/dev/net" ]; then
+	echo "Creating /dev/net"
+	mkdir -p /dev/net
+fi
+if [ ! -c "/dev/net/tun" ]; then
+	mknod /dev/net/tun c 10 200
+fi
+
+# Setup tun0 as tunnel interface
+openvpn --rmtun --dev tun0
+openvpn --mktun --dev tun0 --dev-type tun --user abc --group abc

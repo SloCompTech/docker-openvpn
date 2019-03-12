@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#
+#   Additional functions
+#
+
+function yn() {
+    local defaultOption=${1:-'n'}
+    local defaultText='[y/N]:'
+    if [ defaultOption = 'y' ]; then
+        defaultText='[Y/n]:'
+    fi
+    read -p "$defaultText" decision
+    if [ "$decision" = 'y' ] || [ "$decision" = 'Y' ]; then
+        echo '1'
+    else
+        echo '0'
+    fi 
+}

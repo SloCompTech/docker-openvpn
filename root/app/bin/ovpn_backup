@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#
+# Backup sciript
+#
+
+ARCHIVE_CMD="tar --exclude=$OVPN_ROOT/backup -zcvf"
+
+# User permission fix
+if [ "$USER" != "abc" ]; then
+    RUNAS="sudo -E -u abc"
+else
+    RUNAS=""
+fi
+
+function usage() {
+    echo "Usage: ovpn_backup COMMAND"
+    echo ""
+    echo "Commands:"
+    echo "  all     # Backup whole config directory"
+    echo "  pki     # Backup PKI files"
+    echo "  hooks   # Backup hooks"
+    echo "  openvpn # Backup openvpn live config"
+}
+
+if [ $# -lt 1 ] || [ $1 = "help" ] || [ $1 = "-h" ] || [ $1 = "--help" ]; then
+    usage
+    exit 1
+fi
+
+
+
+if [ $1 = "all" ]; then
+    $RUNAS $ARCHIVE_CMD $OVPN_ROOT/backup/backup_all_$(date +%H%M%S%d%m%Y).tar.gz $OVPN_ROOT
+elif [ $1 = "pki" ]; then
+    $RUNAS $ARCHIVE_CMD $OVPN_ROOT/backup/backup_pki_$(date +%H%M%S%d%m%Y).tar.gz $EASYRSA_PKI $OVPN_ROOT/ssl
+elif [ $1 = "hooks" ]; then
+    $RUNAS $ARCHIVE_CMD $OVPN_ROOT/backup/backup_hooks_$(date +%H%M%S%d%m%Y).tar.gz $OVPN_HOOKS
+elif [ $1 = "openvpn" ]; then
+    $RUNAS $ARCHIVE_CMD $OVPN_ROOT/backup/backup_conf_$(date +%H%M%S%d%m%Y).tar.gz $OVPN_CONFIG
+else
+    usage
+    exit 1
+fi

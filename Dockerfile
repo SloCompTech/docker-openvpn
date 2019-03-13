@@ -42,14 +42,12 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main/" >> /etc/apk/repositor
     # Remove any temporary files created by apk
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/* && \
     # Add permission for network management to user abc
-    echo "abc ALL=(ALL) NOPASSWD: /sbin/ip" >> /etc/sudoers && \
-    # Create tunnel interface
-    mkdir -p /dev/net && \
-    mknod /dev/net/tun c 10 200
+    echo "abc ALL=(ALL) NOPASSWD: /sbin/ip" >> /etc/sudoers
 
 # Add repo files to image
 COPY root/ /
 
 # Configure
 RUN chmod +x /app/bin/* && \
+    chmod +x /usr/local/sbin/* && \
     chmod -R 0644 /etc/logrotate.d

@@ -11,6 +11,7 @@ if [ ! -d "/dev/net" ]; then
 fi
 if [ ! -c "/dev/net/tun" ]; then
 	mknod /dev/net/tun c 10 200
+	chmod 666 /dev/net/tun
 fi
 
 # Setup tun0 as tunnel interface

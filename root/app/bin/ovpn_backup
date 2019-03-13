@@ -37,7 +37,7 @@ elif [ $1 = "pki" ]; then
 elif [ $1 = "hooks" ]; then
     $RUNAS $ARCHIVE_CMD $OVPN_ROOT/backup/backup_hooks_$(date +%H%M%S%d%m%Y).tar.gz $OVPN_HOOKS
 elif [ $1 = "openvpn" ]; then
-    $RUNAS $ARCHIVE_CMD $OVPN_ROOT/backup/backup_conf_$(date +%H%M%S%d%m%Y).tar.gz $OVPN_CONFIG
+    $RUNAS $ARCHIVE_CMD $OVPN_ROOT/backup/backup_conf_$(date +%H%M%S%d%m%Y).tar.gz $OVPN_ROOT/openvpn
 else
     usage
     exit 1

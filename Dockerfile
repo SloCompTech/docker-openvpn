@@ -26,7 +26,6 @@ ENV PATH="/app/bin:$PATH" \
     EASYRSA_SAFE_CONF=/config/ssl/safessl-easyrsa.cnf \
     EASYRSA_TEMP_FILE=/config/temp \
     OVPN_ROOT=/config \
-    OVPN_CONFIG=/config/openvpn \
     OVPN_HOOKS=/config/hooks \
     OVPN_RUN=system.conf
 

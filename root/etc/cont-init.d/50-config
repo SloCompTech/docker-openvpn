@@ -58,12 +58,12 @@ done
 if [ ! -e "/config/ssl" ]; then
 	echo "Setting up /config/ssl"
 	mkdir -p /config/ssl
-	cp -R -u $EASYRSA/openssl-easyrsa.cnf $EASYRSA_SSL_CONF
+	#cp -R -u $EASYRSA/openssl-easyrsa.cnf $EASYRSA_SSL_CONF
 	cp -R -u $EASYRSA/vars.example /config/ssl/vars
 else
-	if [ ! -e "$EASYRSA_SSL_CONF" ]; then
-		cp -R -u $EASYRSA/openssl-easyrsa.cnf $EASYRSA_SSL_CONF
-	fi
+	#if [ ! -e "$EASYRSA_SSL_CONF" ]; then
+	#	cp -R -u $EASYRSA/openssl-easyrsa.cnf $EASYRSA_SSL_CONF
+	#fi
 	if [ ! -e "/config/ssl/vars" ]; then
 		cp -R -u $EASYRSA/vars.example /config/ssl/vars
 	fi

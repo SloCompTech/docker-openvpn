@@ -41,7 +41,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main/" >> /etc/apk/repositor
     # Remove any temporary files created by apk
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/* && \
     # Add permission for network management to user abc
-    echo "abc ALL=(ALL) NOPASSWD: /sbin/ip" >> /etc/sudoers
+    echo "abc ALL=(ALL) NOPASSWD: /sbin/ip, /sbin/iptables" >> /etc/sudoers
 
 # Add repo files to image
 COPY root/ /

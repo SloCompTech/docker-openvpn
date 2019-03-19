@@ -8,10 +8,10 @@ If you care copyright of your contributed material, put JavaDoc style notice in 
 
 ``` bash
 #
-# Script that ... SHORT DESCRIPTIO
-# @author <name>
-# @version <version>
-# @since <date in DD/MM/YYYY format>
+#   Script that ... SHORT DESCRIPTIO
+#   @author <name>
+#   @version <version>
+#   @since <date in DD/MM/YYYY format>
 #
 ```
 

@@ -9,5 +9,5 @@ echo "Building image"
 docker build \
     --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
     --build-arg VCS_REF=$SOURCE_COMMIT \
-    --build-arg VCS_SRC="https://github.com/SloCompTech/docker-openvpn/commit/$SOURCE_COMMIT"
+    --build-arg VCS_SRC="https://github.com/SloCompTech/docker-openvpn/commit/$SOURCE_COMMIT" \
     -t $IMAGE_NAME .

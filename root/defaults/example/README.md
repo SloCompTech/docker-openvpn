@@ -46,12 +46,12 @@ config
 Wizard is script that helps user to simply configure your example to his needs.
 User will call `ovpn_enconf CONFIG_NAME [wizard args]` to load your example in server config.  
 
-Then there are to options:
+Then there are two options:
 
 1. User manualy configure settigns in `/config/openvpn` folder
 2. Your **wizard** script, configures files in `/config/openvpn`
     - Configuration files are copied to temporary location (so they can be modified)
-    - `wizard` script will be called with temporary location as first argument (folder has same structure as in examples)
+    - `wizard` script will be called with temporary location as first argument `$1` (folder has same structure as in examples)
 
 ## General hooks
 

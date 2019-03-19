@@ -40,6 +40,7 @@ config
 - **DO NOT** use `dev` attribute, because it is set to static interface `tun0`.
 - **DO NOT** use any script running directives, because they are probably already set in `system.conf` (except `auth-user-pass-verify` is commented out), but use hooks directory.
 - **DO NOT** use log directives, because they are already set for `log` directory.
+- Please name your hooks as `\<number\>-\<name\>` to ensure order of execution.
 
 ### Wizard
 

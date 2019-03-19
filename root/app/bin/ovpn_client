@@ -31,6 +31,16 @@ function build_ovpn() {
             cat $file
         done
 
+        # Check if server config is using tls-crypt or tls-auth
+        local crypto=""
+        for srv_file in $OVPN_ROOT/openvpn/server/*.conf
+        do
+            crypto="$(ovpn_findopt $srv_file tls-crypt tls-auth)"
+            if [ -n "$crypto" ]; then
+                break
+            fi
+        done
+
         # CA
         echo "<ca>"
         cat $EASYRSA_PKI/ca.crt
@@ -47,10 +57,17 @@ function build_ovpn() {
         cat $EASYRSA_PKI/private/$1.key
         echo "</key>"
 
-        # tls-crypt
-        echo "<tls-crypt>"
-        cat $EASYRSA_PKI/ta.key
-        echo "</tls-crypt>"
+        if [ "$crypto" = "tls-crypt" ]; then
+            # tls-crypt
+            echo "<tls-crypt>"
+            cat $EASYRSA_PKI/ta.key
+            echo "</tls-crypt>"
+        elif [ "$crypto" = "tls-auth" ]; then
+            # tls-auth
+            echo "<tls-auth>"
+            cat $EASYRSA_PKI/ta.key
+            echo "</tls-auth>"
+        fi
     fi
 }
 

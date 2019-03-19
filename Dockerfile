@@ -1,5 +1,8 @@
-
+#
 # Base image
+# @see https://github.com/linuxserver/docker-baseimage-alpine
+# @see https://github.com/linuxserver/docker-baseimage-alpine-python3
+#
 FROM lsiobase/alpine.python3:latest
 
 # Build arguments

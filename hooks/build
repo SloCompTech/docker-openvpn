@@ -2,6 +2,7 @@
 
 #
 #   DockerHub build hook (overrides default build command)
+#   @see https://docs.docker.com/docker-hub/builds/advanced/
 #
 
 echo "Building image"

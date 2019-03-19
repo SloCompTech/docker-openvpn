@@ -46,8 +46,8 @@ Sections:
     ssl
         safessl-easyrsa.cnf
         vars
-    example # Example configs
-        config # Example client & server configs (see root/defaults/example/README.md)
+    example # Example configs (see root/defaults/example/README.md)
+        config # Example client & server configs
         hook # Example hook configs
     module # Modules for openvpn
     hooks # Put your custom scripts in one of subfolders

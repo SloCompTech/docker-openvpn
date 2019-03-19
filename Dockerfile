@@ -9,7 +9,7 @@ FROM lsiobase/alpine.python3:latest
 #
 LABEL   org.opencontainers.image.title = "OpenVPN Server" \
         org.opencontainers.image.description = "Docker image with OpenVPN server" \
-        org.opencontainers.image.url = "" \
+        org.opencontainers.image.url = "https://github.com/SloCompTech/docker-openvpn" \
         org.opencontainers.image.authors = "Martin Dagarin <>" \
         org.opencontainers.image.version = "0.0.2"
 

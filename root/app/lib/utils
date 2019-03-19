@@ -17,3 +17,32 @@ function yn() {
         echo '0'
     fi 
 }
+
+#
+#   Checks if item is in array
+#   @param $1 Array as "${array[@]}"
+#   @param $2 String we are looking for
+#   @return 0 If not in array, 1 if in array
+#
+#   arrayContains array "element"
+#   echo $?
+#
+function arrayContains() {
+    # Check if empty
+    if [ ! -n "$1" ]; then
+        return 0
+    fi
+
+    local array="$1[@]"
+    # Check array for element
+    for element in "${!array}"; do 
+        
+        # Check if we found element in array
+        if [ "$2" = "$element" ]; then
+            return 1
+        fi
+    done
+
+    # Element not found
+    return 0
+}

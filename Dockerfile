@@ -2,16 +2,26 @@
 # Base image
 FROM lsiobase/alpine.python3:latest
 
+# Build arguments
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VCS_SRC
+ARG VERSION
+
 # 
 # Image labels
 # @see https://github.com/opencontainers/image-spec/blob/master/annotations.md
 # @see https://semver.org/
 #
-LABEL   org.opencontainers.image.title = "OpenVPN Server" \
-        org.opencontainers.image.description = "Docker image with OpenVPN server" \
-        org.opencontainers.image.url = "https://github.com/SloCompTech/docker-openvpn" \
-        org.opencontainers.image.authors = "Martin Dagarin <>" \
-        org.opencontainers.image.version = "0.0.2"
+LABEL   org.opencontainers.image.title="OpenVPN Server" \
+        org.opencontainers.image.description="Docker image with OpenVPN server" \
+        org.opencontainers.image.url="https://github.com/SloCompTech/docker-openvpn" \
+        org.opencontainers.image.authors="Martin Dagarin <martin.dagarin@gmail.com>" \
+        org.opencontainers.image.version=$VERSION \
+        org.opencontainers.image.revision=$VCS_REF \
+        org.opencontainers.image.source=$VCS_SRC \
+        org.opencontainers.image.created=$BUILD_DATE
+
 
 #
 # Environment variables

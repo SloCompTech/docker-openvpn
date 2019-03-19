@@ -2,6 +2,15 @@
 # [slocomptech/docker-openvpn]()
 
 
+Features:  
+
+- OpenVPN is running as non-root user, soo it has limited permission.
+- OpenVPN is running in isolated environment (container) so you don't break it with updates, upgrades of your PC.
+- Easy managed (has helper scripts).
+- Easy start (Simple first-start guide).
+- Easly modified to your needs (see [docs](CONTRIBUTING.md)).
+- Easy scripting (python3 installed).
+
 ## Usage
 
 ### docker
@@ -68,17 +77,18 @@ Feel free to contribute new features to this container, but first see [Contribut
 
 Planed features:
 
-- Hooks
-- Example configs
-- Setup instructions
-- Setup scripts
-- Setup & run via environment variables
-- Config overwrite protection
-
 Wanted features (please help implement):
 
 - LDAP authentication script
 - Google authenticator 
+
+## Licenses
+
+- [This project](LICENSE.md)  
+- [OpenVPN]()  
+- [Base image](https://github.com/linuxserver/docker-baseimage-alpine)  
+- [s6 Layer](https://github.com/just-containers/s6-overlay/blob/master/LICENSE.md)  
+
 
 ## Versions
 

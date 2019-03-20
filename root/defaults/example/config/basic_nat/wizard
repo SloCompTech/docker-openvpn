@@ -44,7 +44,7 @@ if len(network) == 0:
     network = "10.0.0.0"
 
 # Select port
-port = input("Port [1104]:")
+port = input("Port [1194]:")
 if len(port) == 0:
     port="1194"
 

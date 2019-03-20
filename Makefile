@@ -5,7 +5,7 @@
 
 IMAGE_NAME=slocomptech/openvpn
 DATA_DIR=$(shell pwd)/data
-CONTAINER=ovpn
+CONTAINER_NAME=ovpn
 
 
 default: build
@@ -37,29 +37,29 @@ config:
 #
 setup:
 	@echo "Running temporary container"
-	docker run -it --cap-add NET_ADMIN -p 1194:1194/udp -v ${DATA_DIR}:/config --name ${CONTAINER} ${IMAGE_NAME}:latest 
+	docker run -it --cap-add NET_ADMIN -p 1194:1194/udp -v ${DATA_DIR}:/config --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest 
 
 #
 #	Starts container
 #
 start:
-	docker start ${CONTAINER}
+	docker start ${CONTAINER_NAME}
 
 #
 #	Stops container
 #
 stop:
-	docker stop ${CONTAINER}
+	docker stop ${CONTAINER_NAME}
 
 #
 #	Restart container
 #
 restart:
-	docker restart ${CONTAINER}
+	docker restart ${CONTAINER_NAME}
 
 #
 #	Open terminal inside container
 #	Only when container is running
 #
 term:
-	docker exec -it ${CONTAINER} bash
+	docker exec -it ${CONTAINER_NAME} bash

@@ -1,2 +1,4 @@
-tmp.txt
-tmp
+# Data folder for docker data
+/data
+/tmp.txt
+/tmp

@@ -4,13 +4,20 @@
 #   Network setup
 #
 
-# Setup tunnel driver
+# 
+# 	Setup tunnel driver
+#
+#	@see https://help.skysilk.com/support/solutions/articles/9000136471-how-to-enable-tun-tap-on-linux-vps-with-skysilk
+#	@see https://community.openvpn.net/openvpn/wiki/UnprivilegedUser
+#	@see https://unix.stackexchange.com/questions/18215/which-user-group-can-use-the-tap-net-device
+#
 if [ ! -d "/dev/net" ]; then
 	echo "Creating /dev/net"
 	mkdir -p /dev/net
 fi
 if [ ! -c "/dev/net/tun" ]; then
 	mknod /dev/net/tun c 10 200
+	chmod 666 /dev/net/tun
 fi
 
 # Setup tun0 as tunnel interface

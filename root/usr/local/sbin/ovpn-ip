@@ -3,4 +3,4 @@
 #
 # Modify routing without root user
 #
-sudo /sbin/ip $*
+sudo /sbin/ip "$@"

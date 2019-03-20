@@ -8,10 +8,10 @@ If you care copyright of your contributed material, put JavaDoc style notice in 
 
 ``` bash
 #
-# Script that ... SHORT DESCRIPTIO
-# @author <name>
-# @version <version>
-# @since <date in DD/MM/YYYY format>
+#   Script that ... SHORT DESCRIPTIO
+#   @author <name>
+#   @version <version>
+#   @since <date in DD/MM/YYYY format>
 #
 ```
 
@@ -40,18 +40,21 @@ config
 - **DO NOT** use `dev` attribute, because it is set to static interface `tun0`.
 - **DO NOT** use any script running directives, because they are probably already set in `system.conf` (except `auth-user-pass-verify` is commented out), but use hooks directory.
 - **DO NOT** use log directives, because they are already set for `log` directory.
+- Please name your hooks as `<number>-<name>` to ensure order of execution.
 
 ### Wizard
 
 Wizard is script that helps user to simply configure your example to his needs.
 User will call `ovpn_enconf CONFIG_NAME [wizard args]` to load your example in server config.  
 
-Then there are to options:
+Then there are two options:
 
 1. User manualy configure settigns in `/config/openvpn` folder
-2. Your **wizard** script, configures files in `/config/openvpn`
+2. Your **wizard** script, configures files which will be copied to `/config/openvpn`
     - Configuration files are copied to temporary location (so they can be modified)
-    - `wizard` script will be called with temporary location as first argument (folder has same structure as in examples)
+    - `wizard` script will be called with temporary location as first argument `$1` (folder has same structure as in examples)
+    - Your `wizard` script **MUST** only modify files in temporary location.
+    - When your wizard exits with code 0, files are copied from temporary location to config folder.
 
 ## General hooks
 

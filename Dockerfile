@@ -1,17 +1,39 @@
-
+#
 # Base image
+# @see https://github.com/linuxserver/docker-baseimage-alpine
+# @see https://github.com/linuxserver/docker-baseimage-alpine-python3
+#
 FROM lsiobase/alpine.python3:latest
+
+# Build arguments
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VCS_SRC
+ARG VERSION
 
 # 
 # Image labels
 # @see https://github.com/opencontainers/image-spec/blob/master/annotations.md
+# @see http://label-schema.org/rc1/
 # @see https://semver.org/
 #
-LABEL   org.opencontainers.image.title = "OpenVPN Server" \
-        org.opencontainers.image.description = "Docker image with OpenVPN server" \
-        org.opencontainers.image.url = "" \
-        org.opencontainers.image.authors = "Martin Dagarin <>" \
-        org.opencontainers.image.version = "0.0.2"
+LABEL   org.opencontainers.image.title="OpenVPN Server" \
+        org.label-schema.name="OpenVPN Server" \
+        org.opencontainers.image.description="Docker image with OpenVPN server" \
+        org.label-schema.description="Docker image with OpenVPN server" \
+        org.opencontainers.image.url="https://github.com/SloCompTech/docker-openvpn" \
+        org.label-schema.url="https://github.com/SloCompTech/docker-openvpn" \
+        org.opencontainers.image.authors="Martin Dagarin <martin.dagarin@gmail.com>" \
+        org.opencontainers.image.version=$VERSION \
+        org.label-schema.version=$VERSION \
+        org.opencontainers.image.revision=$VCS_REF \
+        org.label-schema.vcs-ref=$VCS_REF \
+        org.opencontainers.image.source=$VCS_SRC \
+        org.label-schema.vcs-url=$VCS_SRC \
+        org.opencontainers.image.created=$BUILD_DATE \
+        org.label-schema.build-date=$BUILD_DATE \
+        org.label-schema.schema-version="1.0"
+
 
 #
 # Environment variables
@@ -26,7 +48,6 @@ ENV PATH="/app/bin:$PATH" \
     EASYRSA_SAFE_CONF=/config/ssl/safessl-easyrsa.cnf \
     EASYRSA_TEMP_FILE=/config/temp \
     OVPN_ROOT=/config \
-    OVPN_CONFIG=/config/openvpn \
     OVPN_HOOKS=/config/hooks \
     OVPN_RUN=system.conf
 
@@ -42,14 +63,12 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main/" >> /etc/apk/repositor
     # Remove any temporary files created by apk
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/* && \
     # Add permission for network management to user abc
-    echo "abc ALL=(ALL) NOPASSWD: /sbin/ip" >> /etc/sudoers && \
-    # Create tunnel interface
-    mkdir -p /dev/net && \
-    mknod /dev/net/tun c 10 200
+    echo "abc ALL=(ALL) NOPASSWD: /sbin/ip, /sbin/iptables" >> /etc/sudoers
 
 # Add repo files to image
 COPY root/ /
 
 # Configure
 RUN chmod +x /app/bin/* && \
+    chmod +x /usr/local/sbin/* && \
     chmod -R 0644 /etc/logrotate.d

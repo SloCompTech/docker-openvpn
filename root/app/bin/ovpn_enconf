@@ -150,7 +150,7 @@ if [ $# -gt 0 ]; then
     if [ -f "$config_path/wizard" ] && [ -x "$config_path/wizard" ]; then
         tmp_path=/tmp/wizard
 
-        # Delete existing tmp dir
+        # Delete existing tmp directory
         if [ -e "$tmp_path" ]; then
             rm -rf $tmp_path
         fi
@@ -172,6 +172,9 @@ if [ $# -gt 0 ]; then
         install_server $tmp_path $OVPN_ROOT/openvpn
         install_client $tmp_path $OVPN_ROOT/openvpn
         install_hooks $tmp_path $OVPN_ROOT
+
+        # Remove temporary directory
+        rm -rf $tmp_path
     else
         # Directly copy files
         install_server $config_path $OVPN_ROOT/openvpn

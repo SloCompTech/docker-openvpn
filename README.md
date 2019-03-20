@@ -1,6 +1,7 @@
 
 # [slocomptech/docker-openvpn](https://github.com/SloCompTech/docker-openvpn)
 
+[![](https://images.microbadger.com/badges/version/slocomptech/openvpn.svg)](https://microbadger.com/images/slocomptech/openvpn "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/image/slocomptech/openvpn.svg)](https://microbadger.com/images/slocomptech/openvpn "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/commit/slocomptech/openvpn.svg)](https://microbadger.com/images/slocomptech/openvpn "Get your own commit badge on microbadger.com") ![](https://img.shields.io/docker/cloud/automated/slocomptech/openvpn.svg) ![](https://img.shields.io/docker/cloud/build/slocomptech/openvpn.svg)
 
 Features:  
 

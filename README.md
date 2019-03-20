@@ -1,22 +1,34 @@
 
-# [slocomptech/docker-openvpn]()
+# [slocomptech/docker-openvpn](https://github.com/SloCompTech/docker-openvpn)
 
 
 Features:  
 
-- OpenVPN is running as non-root user, soo it has limited permission.
-- OpenVPN is running in isolated environment (container) so you don't break it with updates, upgrades of your PC.
-- Easy managed (has helper scripts).
+- OpenVPN running as non-root user (limited permission)
+- Containerized (Isolated environment)
+- Easy managed (Helper scripts).
 - Easy start (Simple first-start guide).
 - Easly modified to your needs (see [docs](CONTRIBUTING.md)).
 - Easy scripting (python3 installed).
 
 ## Usage
 
+Here are some example snippets to help you get started creating a container.  
+
 ### docker
 
 ``` bash
-
+# Normal start command (but you need to setup config first)
+docker run \
+  --name=ovpn \
+  --cap-add NET_ADMIN \
+  -e PUID=1000 \
+  -e GUID=1000 \
+  -p 1194:1194/udp \
+  -v </path/o/config>:/config \
+  --restart=unless-stopped \
+  --network host \
+  slocomptech/openvpn:latest
 ```
 
 ### docker-compose
@@ -29,6 +41,9 @@ Features:
 
 |**Parameter**|**Function**|
 |:-----------:|:----------:|
+|`-e PUID=1000`|for UserID - see below for explanation|
+|`-e PGID=1000`|for GroupID - see below for explanation|
+|`-v /config`|All the config files including OpenVPNs reside here|
 
 ## User / Group Identifiers
 
@@ -45,29 +60,56 @@ In this instance `PUID=1000` and `PGID=1000`, to find yours use `id user` as bel
 
 ## Application setup
 
-``` bash
-# Setup config directory
-sudo docker run -v <Config on Host>:/config --rm -it slocomptech/docker-openvpn bash
-$ ovpn_init
-# Here will ask for password for CA (needed for signing new certificates) (add nopass if you dont want to set password)
-# Enable basic example as config & edit /config/openvpn/server/server_*.conf & /config/openvpn/client_*.conf
-$ ovpn_enconf basic1
-# Or put your own server config in /config/openvpn/server & client template (without certs) to /config/openvpn/client
-# To add client (generate certificates)
-$ ovpn_client add <name> [nopass]
-# To build .ovpn file
-$ ovpn_client ovpn <name> > <file>
-# Or from outside of docker (currently not working yet)
-sudo docker exec -it <container name> ovpn_client add <name> nopass && ovpn_client ovpn <name> > <file>
-# Exit from temporary container
-$ exit
-# Run container for real
-sudo docker run -v <Config on Host>:/config --cap-add NET_ADMIN -p 1104:1194/udp --restart=unless-stopped slocomptech/docker-openvpn
-# Setup routing
+### Initial setup
 
-```
+If you are new to containers please see rather [Detailed first setup guide](docs/SetupGuide.md), because it includes more detailed description.
 
-See more in [docs](docs).  
+1. Init configuration directory with initial config files:
+
+  ``` bash
+  docker run -it --rm --cap-add NET_ADMIN -v </path/to/config>:/config slocomptech/openvpn:latest bash
+  ```
+
+2. At this point you will have bash shell which runs in container. Now run following commands to setup your PKI:
+
+  ``` bash
+  ovpn_init [nopass] # Inits PKI
+  ```
+
+3. Setup OpenVPN config based on example `basic_nat` with configuration wizard:  
+
+  ``` bash
+  ovpn_enconf basic_nat
+  #Protocol udp, tcp, udp6, tcp6 [udp]:
+  #VPN network [10.0.0.0]:
+  #Port [1194]:
+  #Public IP or domain of server: <YOUR PUBLIC IP>
+  #DNS1 [8.8.8.8]:
+  #DNS2 [8.8.4.4]:
+  ```
+4. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
+5. Add clients
+
+  ``` bash
+  # Generates client certificates
+  ovpn_client add <name> [nopass]
+
+  # Generates client config file and prints it to screen (redirect to file)
+  ovpn_client ovpn <name> > <config file>.ovpn
+
+  # OR BETTER SOLLUTION: Run outside container
+  docker exec -it <container name> ovpn_client ovpn <name> > <config file>.ovpn
+  ```
+
+5. Exit container with `exit`, then it will destroy itself.
+6. Start container using command specified in *Usage* section.
+
+For more infromation see:
+
+- [Detailed first setup guide](docs/SetupGuide.md)  
+- [docs](docs) (for detailed command usage)  
+- **configuration example directory** (for more info about example)  
+- [Contributing](CONTRIBUTING.md) (for explanation how container works, how to write an example config ...)  
 
 ## Contribute
 
@@ -92,3 +134,4 @@ Wanted features (please help implement):
 
 ## Versions
 
+See [CHANGELOG](CHANGELOG.md)  

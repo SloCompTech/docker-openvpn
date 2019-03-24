@@ -5,6 +5,7 @@ Features:
 - Works out of the box on bridge or host network
 - NAT (Network translation protocol)
 - Has configuration wizard
+- LAN protection (does not allow traffic to LANs connected to server)
 
 ## Configure
 

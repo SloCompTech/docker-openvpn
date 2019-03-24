@@ -112,6 +112,11 @@ For more infromation see:
 - **configuration example directory** (for more info about example)  
 - [Contributing](CONTRIBUTING.md) (for explanation how container works, how to write an example config ...)  
 
+## Troubleshooting
+
+- [OpenVPN troubleshoot guide](https://community.openvpn.net/openvpn/wiki/HOWTO#Troubleshooting)  
+
+
 ## Contribute
 
 Feel free to contribute new features to this container, but first see [Contribute Guide](CONTRIBUTING.md).
@@ -128,7 +133,7 @@ Wanted features (please help implement):
 ## Licenses
 
 - [This project](LICENSE.md)  
-- [OpenVPN]()  
+- [OpenVPN](https://openvpn.net/terms/)  
 - [Base image](https://github.com/linuxserver/docker-baseimage-alpine)  
 - [s6 Layer](https://github.com/just-containers/s6-overlay/blob/master/LICENSE.md)  
 

@@ -15,5 +15,8 @@ ovpn-iptables -P INPUT DROP
 # Allow established connection 
 ovpn-iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT -m comment --comment "Accept traffic from established connections"
 
+# Allow ICMP ping request
+ovpn-iptables -A INPUT -p icmp --icmp-type 8 -j ACCEPT
+
 # Drop all forwarded traffic
 ovpn-iptables -P FORWARD DROP

@@ -1,5 +1,14 @@
 # Changelog
 
+### 1.0.3 - New examples, fixes, more docs
+
+- Updated instructions
+- Improved `Makefile`
+- Allowed **ping** to the container
+- Added new examples **basic_nat_wlp** and **basic_routed**
+- Added **LAN protection** to original example
+- Added **docker-compose** for sample
+
 ### 1.0.2 - Official release
 
 - Fixed typo in `basic_nat` example config wizard  

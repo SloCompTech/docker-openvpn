@@ -29,7 +29,7 @@ build:
 config:
 	@echo "Running temporary container"
 	mkdir -p data
-	docker run -it --rm --cap-add NET_ADMIN -v ${DATA_DIR}:/config ${IMAGE_NAME}:latest bash
+	docker run -it -e PUID=$(id -u) -e PGID=$(id -g) --rm --cap-add NET_ADMIN -v ${DATA_DIR}:/config ${IMAGE_NAME}:latest bash
 
 #
 #	Setups & starts real container
@@ -37,7 +37,7 @@ config:
 #
 setup:
 	@echo "Running temporary container"
-	docker run -it --cap-add NET_ADMIN -p 1194:1194/udp -v ${DATA_DIR}:/config --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest 
+	docker run -it -d -e PUID=$(id -u) -e PGID=$(id -g) --cap-add NET_ADMIN -p 1194:1194/udp -v ${DATA_DIR}:/config --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest 
 
 #
 #	Starts container

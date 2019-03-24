@@ -34,8 +34,37 @@ docker run \
 
 ### docker-compose
 
-```
-
+``` yml
+version: '2.2'
+services:
+  ovpn:
+    image: slocomptech/openvpn
+    container_name: ovpn
+    hostname: ovpn
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "1194:1194/udp"
+    volumes:
+      - ./data:/config
+    environment:
+      - PUID=1000
+      - PGUID=1000
+    restart: on-failure
+    # If you want to build from source add build:
+    build:
+      context: .
+      cache_from:
+        - lsiobase/alpine.python3:latest
+    networks:
+      mynetwork:
+        ipv4_address: 10.0.0.5
+        ipv6_address: 2001:1111::5
+    
+networks:
+  mynetwork:
+    driver: host
+    enable_ipv6: true
 ```
 
 ## Parameters

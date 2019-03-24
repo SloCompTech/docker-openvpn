@@ -1,0 +1,28 @@
+#
+# OpenVPN server sample configuration
+#
+
+version: '2.2'
+services:
+  ovpn:
+    image: slocomptech/openvpn
+    container_name: ovpn
+    hostname: ovpn
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "1194:1194/udp"
+    volumes:
+      - ./data:/config
+    #environment:
+    #  - PUID=1000
+    #  - PGUID=1000
+    restart: on-failure
+    build:
+      context: .
+      cache_from:
+        - lsiobase/alpine.python3:latest
+    
+    network_mode: "bridge"
+    #network_mode: "host"
+    

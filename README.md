@@ -56,6 +56,10 @@ services:
       context: .
       cache_from:
         - lsiobase/alpine.python3:latest
+    sysctls: # For IPv6
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.default.forwarding=1
+      - net.ipv6.conf.all.forwarding=1
     networks:
       mynetwork:
         ipv4_address: 10.0.0.5

@@ -95,6 +95,7 @@ This is simple setup guide to help you get started. It uses the simplest configu
 
   ``` bash
   ovpn_enconf basic_nat
+  #Out interface [eth0]: <interface connected to the Internet>
   #Protocol udp, tcp, udp6, tcp6 [udp]:
   #VPN network [10.0.0.0]:
   #Port [1194]:

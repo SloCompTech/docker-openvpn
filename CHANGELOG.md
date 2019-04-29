@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.0.4 - IPv6 docs, improved wizards
+
+- Added instructions for IPv6 configuration
+- Added outside interface option to setup wizards
 ### 1.0.3 - New examples, fixes, more docs
 
 - Updated instructions

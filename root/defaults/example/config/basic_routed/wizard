@@ -29,6 +29,11 @@ if not os.path.isdir(TEMP_PATH):
     print("Specified directory does not exist")
     sys.exit(2)
 
+# Select output interface
+out_int = input("Out interface [eth0]:")
+if len(out_int) == 0:
+    out_int = "eth0"
+
 # Select protocol
 protocol = input("Protocol udp, tcp, udp6, tcp6 [udp]:")
 AVAILABLE_PROTOCOLS = ["udp", "tcp", "udp6", "tcp6"]
@@ -65,6 +70,7 @@ if len(dns2) == 0:
 
 # Write to server config
 vars = [
+    ("$OUT_INT", out_int),
     ("$PROTO", protocol),
     ("$PORT", port),
     ("$NETWORK_ADDRESS", network),

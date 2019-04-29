@@ -60,15 +60,8 @@ services:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.default.forwarding=1
       - net.ipv6.conf.all.forwarding=1
-    networks:
-      mynetwork:
-        ipv4_address: 10.0.0.5
-        ipv6_address: 2001:1111::5
-    
-networks:
-  mynetwork:
-    driver: host
-    enable_ipv6: true
+    network_mode: host
+
 ```
 
 ## Parameters
@@ -114,6 +107,7 @@ If you are new to containers please see rather [Detailed first setup guide](docs
 
   ``` bash
   ovpn_enconf basic_nat
+  #Out interface [eth0]: <interface connected to the Internet>
   #Protocol udp, tcp, udp6, tcp6 [udp]:
   #VPN network [10.0.0.0]:
   #Port [1194]:
@@ -121,6 +115,7 @@ If you are new to containers please see rather [Detailed first setup guide](docs
   #DNS1 [8.8.8.8]:
   #DNS2 [8.8.4.4]:
   ```
+
 4. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
 5. Add clients
 

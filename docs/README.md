@@ -72,7 +72,8 @@ Configs:
     <example config name>
 ```
 
-**Note:** Please read example documentation to understand how to use it.  
+**Note:** Please read example documentation to understand how to use it.
+**Warning:** Some examples automaticaly add firewall rules, so if you are using host networking make sure to check **iptables** for correct configuration.     
 **Tip:** If you modifed config in a way that others might need same configuration, consider making new example.  
 
 #### ovpn_init

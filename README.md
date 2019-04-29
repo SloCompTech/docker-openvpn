@@ -72,6 +72,8 @@ services:
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-v /config`|All the config files including OpenVPNs reside here|
 
+See also: [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)  
+
 ## User / Group Identifiers
 
 When using volumes (`-v` flags) permissions issues can arise between the host OS and the container, we avoid this issue by allowing you to specify the user `PUID` and group `PGID`.

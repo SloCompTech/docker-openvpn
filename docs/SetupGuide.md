@@ -141,4 +141,4 @@ This is simple setup guide to help you get started. It uses the simplest configu
     ```
 
 **Note:** PUID, GUID parameters are optional.  
-**Note:** Container in this example will connect to host network, so there is less network overhead (recommended), this also works if container is in default docker network.  
+**Note:** Container in this example will connect to host network, so there is less network overhead (recommended), this also works if container is in default docker network. (But be careful if you already have firewall configured, because some rules are added when using most of examples).  

@@ -90,4 +90,5 @@ Sections:
 
 - [OpenVPN docs](https://community.openvpn.net/openvpn/wiki/GettingStartedwithOVPN)  
 - [Setup OpenVPN on alpine linux](https://wiki.alpinelinux.org/wiki/Setting_up_a_OpenVPN_server#Alternative_Certificate_Method)  
-- [EasyRSA](https://community.openvpn.net/openvpn/wiki/GettingStartedwithOVPN)   
+- [EasyRSA](https://community.openvpn.net/openvpn/wiki/GettingStartedwithOVPN)
+- [EasyRSA doc](https://github.com/OpenVPN/easy-rsa/tree/master/doc)

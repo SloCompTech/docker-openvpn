@@ -2,7 +2,7 @@
 # OpenVPN server sample configuration
 #
 
-version: '2.2'
+version: '2.2' # Min version 2.1 for IPv6
 services:
   ovpn:
     image: slocomptech/openvpn
@@ -22,7 +22,11 @@ services:
       context: .
       cache_from:
         - lsiobase/alpine.python3:latest
-    
+    sysctls: # For IPv6
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.default.forwarding=1
+      - net.ipv6.conf.all.forwarding=1
+
     network_mode: "bridge"
     #network_mode: "host"
     

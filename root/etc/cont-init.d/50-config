@@ -3,7 +3,7 @@
 # File which indicates that full init was already done before
 FLAG_FILE=/config/donotdelete
 
-HOOKS_DIR=(init route-up route-pre-down up down client-connect client-disconnect learn-address tls-verify auth)
+HOOKS_DIR=(auth client-connect client-disconnect finish down init learn-address route-pre-down route-up up tls-verify)
 OVPN_DIR=(ccd client server)
 
 FIRST_SETUP=0

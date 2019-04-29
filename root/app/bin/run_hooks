@@ -10,10 +10,17 @@ function usage() {
     echo "Usage: run_hooks HOOK_NAME [ARGS]"
     echo ""
     echo "Hooks:"
-    echo "  up          saasas"
-    echo "  down-pre    asasss"
-    echo "  down-post   asasda"
-    echo "  auth        asdasd"
+    echo "  auth                On OpenVPN client authentication"
+    echo "  client-connect      On OpenVPN client connected"
+    echo "  client-disconnect   On OpenVPN client disconnected"
+    echo "  finish              On container shutdown"
+    echo "  init                On container power on"
+    echo "  learn-address       Client Address & Routes validation"
+    echo "  down                Before/After TUN interface closed"
+    echo "  route-up            After routes are added"
+    echo "  route-pre-down      Before routes are removed"
+    echo "  tls-verify          On OpenVPN client certificate verificaton"
+    echo "  up                  After TUN interface opened"
 }
 
 # Check if hook name is set

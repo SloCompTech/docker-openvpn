@@ -5,6 +5,7 @@
 - Fixed bug when running hooks (#3)
 - Added **finish** hook (which runs just before container exit)
 - Added **persistent interface** option, so interface is persistently present on device (if using host networking mode) and firewall setup rules are executed **only once** (no ip tables mess) (#1)
+- Logging chaned to stdout, no more log file by default
 
 ### 1.0.4 - IPv6 docs, improved wizards
 

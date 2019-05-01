@@ -41,6 +41,7 @@ config
 - **DO NOT** use any script running directives, because they are probably already set in `system.conf` (except `auth-user-pass-verify` is commented out), but use hooks directory.
 - **DO NOT** use log directives, because they are already set for `log` directory.
 - Please name your hooks as `<number>-<name>` to ensure order of execution.
+- If your hooks need access to container environment variables add `#!/usr/bin/with-contenv bash` at the top of the file.
 
 ### Wizard
 

@@ -1,8 +1,18 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
+
+source /app/lib/settings
+source /app/lib/utils
+
+# Run only once if interface persistent
+intPersistant
+if [ $? -eq 1 ]; then
+    run_once "/config/hooks/up/10-network"
+fi
 
 #
 #   Network initialization
 #
+echo "Setting up OpenVPN related firewall rules"
 
 # Open OpenVPN port to outside
 ovpn-iptables -A INPUT -p udp -m udp --dport $PORT -j ACCEPT -m comment --comment "Open OpenVPN port"

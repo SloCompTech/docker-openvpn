@@ -1,8 +1,18 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
+
+source /app/lib/settings
+source /app/lib/utils
+
+# Don't run if interface persistent
+intPersistant
+if [ $? -eq 1 ]; then
+    exit 0
+fi
 
 #
 #   Network clear
 #
+echo "Clearing OpenVPN releated firewall rules"
 
 # Close OpenVPN port to outside
 ovpn-iptables -D INPUT -p udp -m udp --dport $PORT -j ACCEPT -m comment --comment "Open OpenVPN port"

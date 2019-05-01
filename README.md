@@ -70,6 +70,7 @@ services:
 |:-----------:|:----------:|
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
+|`-o OVPN_PERINT=false`|Disable persistent TUN interface|
 |`-v /config`|All the config files including OpenVPNs reside here|
 
 See also: [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)  

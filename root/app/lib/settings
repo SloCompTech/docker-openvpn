@@ -1,0 +1,30 @@
+#!/usr/bin/with-contenv bash
+
+#
+#   Settings functions
+#
+
+#
+#   Checks if TUN interface is supposed to be persistant
+#   @return 1 if persistant, 0 if not
+#
+function intPersistant() {
+    if [ ! -n "$OVPN_PERINT" ] || ([ "$OVPN_PERINT" != "true" ] && [ "$OVPN_PERINT" != "1" ]); then
+        return 0 # Not persistant by default
+    else
+        return 1 # Persistant
+    fi
+}
+
+#
+#   Checks if TUN interface exists already
+#   @return 0 if found, 1 if not found
+#
+function intTunExists() {
+    RES=`cat /proc/net/dev | grep tun0`
+    if [ -n "$RES" ]; then
+        return 0 # Found
+    else
+        return 1 # Not found
+    fi
+}

@@ -1,8 +1,18 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
+
+source /app/lib/settings
+source /app/lib/utils
+
+# Run only once if interface persistent
+intPersistant
+if [ $? -eq 1 ]; then
+    run_once "/config/hooks/init/10-network"
+fi
 
 #
 #   Network initialization
 #
+echo "Setting up basic firewall rules"
 
 #
 # Because default iptables rules are set to ACCEPT all connection, we need to put some

@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.0.5 - Bugfix
+
+- Fixed bug when running hooks (#3)
+
 ### 1.0.4 - IPv6 docs, improved wizards
 
 - Added instructions for IPv6 configuration

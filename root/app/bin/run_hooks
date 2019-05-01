@@ -40,8 +40,9 @@ for script in $OVPN_HOOKS/$1/*; do
     [ -e "$script" ] || continue
 
     # Execute only executable files
-    if [ -f "$script" ] || [ -x "$script" ] || true; then
+    if [ -f "$script" ] && [ -x "$script" ]; then
         # Run script and pass additional args to hooks
+        echo "Executing hook: $script"
         if [ $# -gt 2 ]; then
             $script ${@:2}
         else

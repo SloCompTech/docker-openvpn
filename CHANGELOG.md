@@ -8,6 +8,7 @@
 - Logging chaned to stdout, no more log file by default
 - Added **firewall disable** feature to disable all firewall related modifications
 - Added `ìp6tables` & more permissions to *ip utils*
+- Run OpenVPN only if config is present in `/config/openvpn/server` else **sleep forever** until config was setup & **CONTAINER RESTART**
 
 ### 1.0.4 - IPv6 docs, improved wizards
 

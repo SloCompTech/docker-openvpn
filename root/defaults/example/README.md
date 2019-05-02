@@ -35,6 +35,30 @@ config
         Readme.md # Info about example, what to configure
 ```
 
+### Hooks
+
+- start hook file with
+
+    ``` bash
+    #!/usr/bin/with-contenv bash
+
+    source /app/lib/settings
+    source /app/lib/utils
+    ```
+
+- if hooks call any **firewall** related commands add after above code and before any commands
+
+    ``` bash
+    # Check if firewall rules are disabled
+    useFW
+    if [ $? -eq 0 ]; then
+        # Don't use fw rules
+        exit 0
+    fi
+    ```
+
+- also check the examples how persistent interface is handled, so you don't create iptables mess (running init, up script once, never call down, finish)
+
 ### Notes
 
 - **DO NOT** use `dev` attribute, because it is set to static interface `tun0`.
@@ -50,7 +74,7 @@ User will call `ovpn_enconf CONFIG_NAME [wizard args]` to load your example in s
 
 Then there are two options:
 
-1. User manualy configure settigns in `/config/openvpn` folder
+1. User manualy configure settings in `/config/openvpn` folder
 2. Your **wizard** script, configures files which will be copied to `/config/openvpn`
     - Configuration files are copied to temporary location (so they can be modified)
     - `wizard` script will be called with temporary location as first argument `$1` (folder has same structure as in examples)

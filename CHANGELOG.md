@@ -1,11 +1,12 @@
 # Changelog
 
-### 1.0.5 - Bugfix, finish hook
+### 1.0.5 - Bugfix, finish hook, persistent interface, no firewall
 
 - Fixed bug when running hooks (#3)
 - Added **finish** hook (which runs just before container exit)
 - Added **persistent interface** option, so interface is persistently present on device (if using host networking mode) and firewall setup rules are executed **only once** (no ip tables mess) (#1)
 - Logging chaned to stdout, no more log file by default
+- Added **firewall disable** feature to disable all firewall related modifications
 
 ### 1.0.4 - IPv6 docs, improved wizards
 

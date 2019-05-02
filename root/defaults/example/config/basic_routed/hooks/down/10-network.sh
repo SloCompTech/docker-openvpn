@@ -3,6 +3,13 @@
 source /app/lib/settings
 source /app/lib/utils
 
+# Check if firewall rules are disabled
+useFW
+if [ $? -eq 0 ]; then
+    # Don't use fw rules
+    exit 0
+fi
+
 # Don't run if interface persistent
 intPersistant
 if [ $? -eq 1 ]; then

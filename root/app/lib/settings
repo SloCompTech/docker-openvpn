@@ -17,6 +17,18 @@ function intPersistant() {
 }
 
 #
+#   Checks if we use firewall rules
+#   @return 1 if yes, 0 if not
+#
+function useFW() {
+    if [ ! -n "$OVPN_NFW" ] || ([ "$OVPN_NFW" != "true" ] && [ "$OVPN_NFW" != "1" ]); then
+        return 1 # yes by default
+    else
+        return 0 # No
+    fi
+}
+
+#
 #   Checks if TUN interface exists already
 #   @return 0 if found, 1 if not found
 #

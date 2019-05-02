@@ -94,4 +94,4 @@ Hooks are located in `hook` directory. Please follow hook guidelines:
     - What this hook does
     - Setttings with comments and an example settings values
 
-**Note:** All hooks run as non-root user so instead of using `ip` and `iptables` use `ovpn-ip` and `ovpn-iptables`.
+**Note:** All hooks run as non-root user so instead of using `ip` and `iptables` use `ovpn-ip`, `ovpn-iptables`, `ovpn-ip6tables` (see [/root/usr/local/sbin](/usr/local/sbin)).

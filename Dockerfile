@@ -55,7 +55,7 @@ ENV PATH="/app/bin:$PATH" \
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main/" >> /etc/apk/repositories && \
     apk add --no-cache \
     # Core packages
-    bash sudo iptables git openvpn easy-rsa && \
+    bash sudo iptables ip6tables git openvpn easy-rsa && \
     # Link easy-rsa in bin directory
     ln -s ${EASYRSA}/easyrsa /usr/local/bin && \
     # Link python3 also as python
@@ -63,7 +63,10 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main/" >> /etc/apk/repositor
     # Remove any temporary files created by apk
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/* && \
     # Add permission for network management to user abc
-    echo "abc ALL=(ALL) NOPASSWD: /sbin/ip, /sbin/iptables" >> /etc/sudoers
+    echo "abc ALL=(ALL) NOPASSWD: /sbin/ip, /sbin/ip6tables, /sbin/ip6tables-compat, /sbin/ip6tables-compat-restore, /sbin/ip6tables-compat-save, /sbin/ip6tables-restore, /sbin/ip6tables-restore-translate, \
+        /sbin/ip6tables-save, /sbin/ip6tables-translate, /sbin/iptables, /sbin/iptables-compat, /sbin/iptables-compat-restore, /sbin/iptables-compat-save, \
+        /sbin/iptables-restore, /sbin/iptables-restore-translate, /sbin/iptables-save, /sbin/iptables-translate, /sbin/route" \
+        >> /etc/sudoers.d/abc
 
 # Add repo files to image
 COPY root/ /

@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.0.5 - Bugfix, finish hook, persistent interface, no firewall ...
+
+- Fixed bug when running hooks (#3)
+- Added **finish** hook (which runs just before container exit)
+- Added **persistent interface** option, so interface is persistently present on device (if using host networking mode) and firewall setup rules are executed **only once** (no ip tables mess) (#1)
+- Logging chaned to stdout, no more log file by default
+- Added **firewall disable** feature to disable all firewall related modifications
+- Added `ìp6tables` & more permissions to *ip utils*
+- Run OpenVPN only if config is present in `/config/openvpn/server` else **sleep forever** until config was setup & **CONTAINER RESTART**
+
 ### 1.0.4 - IPv6 docs, improved wizards
 
 - Added instructions for IPv6 configuration

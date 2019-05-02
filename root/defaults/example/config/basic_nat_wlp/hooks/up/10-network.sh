@@ -1,8 +1,25 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
+
+source /app/lib/settings
+source /app/lib/utils
+
+# Check if firewall rules are disabled
+useFW
+if [ $? -eq 0 ]; then
+    # Don't use fw rules
+    exit 0
+fi
+
+# Run only once if interface persistent
+intPersistant
+if [ $? -eq 1 ]; then
+    run_once "/config/hooks/up/10-network"
+fi
 
 #
 #   Network initialization
 #
+echo "Setting up OpenVPN related firewall rules"
 
 # Open OpenVPN port to outside
 ovpn-iptables -A INPUT -p udp -m udp --dport $PORT -j ACCEPT -m comment --comment "Open OpenVPN port"

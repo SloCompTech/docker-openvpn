@@ -35,12 +35,37 @@ config
         Readme.md # Info about example, what to configure
 ```
 
+### Hooks
+
+- start hook file with
+
+    ``` bash
+    #!/usr/bin/with-contenv bash
+
+    source /app/lib/settings
+    source /app/lib/utils
+    ```
+
+- if hooks call any **firewall** related commands add after above code and before any commands
+
+    ``` bash
+    # Check if firewall rules are disabled
+    useFW
+    if [ $? -eq 0 ]; then
+        # Don't use fw rules
+        exit 0
+    fi
+    ```
+
+- also check the examples how persistent interface is handled, so you don't create iptables mess (running init, up script once, never call down, finish)
+
 ### Notes
 
 - **DO NOT** use `dev` attribute, because it is set to static interface `tun0`.
 - **DO NOT** use any script running directives, because they are probably already set in `system.conf` (except `auth-user-pass-verify` is commented out), but use hooks directory.
 - **DO NOT** use log directives, because they are already set for `log` directory.
 - Please name your hooks as `<number>-<name>` to ensure order of execution.
+- If your hooks need access to container environment variables add `#!/usr/bin/with-contenv bash` at the top of the file.
 
 ### Wizard
 
@@ -49,7 +74,7 @@ User will call `ovpn_enconf CONFIG_NAME [wizard args]` to load your example in s
 
 Then there are two options:
 
-1. User manualy configure settigns in `/config/openvpn` folder
+1. User manualy configure settings in `/config/openvpn` folder
 2. Your **wizard** script, configures files which will be copied to `/config/openvpn`
     - Configuration files are copied to temporary location (so they can be modified)
     - `wizard` script will be called with temporary location as first argument `$1` (folder has same structure as in examples)
@@ -69,4 +94,4 @@ Hooks are located in `hook` directory. Please follow hook guidelines:
     - What this hook does
     - Setttings with comments and an example settings values
 
-**Note:** All hooks run as non-root user so instead of using `ip` and `iptables` use `ovpn-ip` and `ovpn-iptables`.
+**Note:** All hooks run as non-root user so instead of using `ip` and `iptables` use `ovpn-ip`, `ovpn-iptables`, `ovpn-ip6tables` (see [/root/usr/local/sbin](/usr/local/sbin)).

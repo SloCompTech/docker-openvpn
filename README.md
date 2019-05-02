@@ -70,6 +70,8 @@ services:
 |:-----------:|:----------:|
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
+|`-e OVPN_NFW=true`|Disable any firewall related rules to be created, modified ... (must be implemented in example)|
+|`-e OVPN_PERINT=false`|Disable persistent TUN interface|
 |`-v /config`|All the config files including OpenVPNs reside here|
 
 See also: [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)  
@@ -146,7 +148,6 @@ For more infromation see:
 
 - [OpenVPN troubleshoot guide](https://community.openvpn.net/openvpn/wiki/HOWTO#Troubleshooting)  
 
-
 ## Contribute
 
 Feel free to contribute new features to this container, but first see [Contribute Guide](CONTRIBUTING.md).
@@ -158,7 +159,7 @@ Planed features:
 Wanted features (please help implement):
 
 - LDAP authentication script
-- Google authenticator 
+- Google authenticator
 
 ## Licenses
 
@@ -166,7 +167,6 @@ Wanted features (please help implement):
 - [OpenVPN](https://openvpn.net/terms/)  
 - [Base image](https://github.com/linuxserver/docker-baseimage-alpine)  
 - [s6 Layer](https://github.com/just-containers/s6-overlay/blob/master/LICENSE.md)  
-
 
 ## Versions
 

@@ -51,16 +51,17 @@ Sections:
         hook # Example hook configs
     module # Modules for openvpn
     hooks # Put your custom scripts in one of subfolders
+        auth # On authentication (needs to be enabled in config)
+        client-connect # Client connected
+        client-disconnect # Client disconnected
+        down # After interface is down
+        finish # Deinit container
         init # Init container
+        learn-address
         route-up # After routes are added
         route-pre-down # Before routes are removed
         up # After interface is up  
-        down # After interface is down
-        client-connect # Client connected
-        client-disconnect # Client disconnected
-        learn-address
         tls-verify # Check certificate
-        auth # On authentication (needs to be enabled in config)
     system.conf # System OpenVPN config file (do not edit, unless instructed)
     include-server.conf # File that includes all server configuration files (automatically generated)
     donotdelete # Leave this file alone, if deleted it triggers full setup

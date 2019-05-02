@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#
+# Modify iptables without root user
+#
+sudo /sbin/ip6tables "$@"

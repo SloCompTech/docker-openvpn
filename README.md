@@ -71,7 +71,7 @@ services:
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-e OVPN_NFW=true`|Disable any firewall related rules to be created, modified ... (must be implemented in example)|
-|`-e OVPN_PERINT=false`|Disable persistent TUN interface|
+|`-e OVPN_PERINT=true`|Enable persistent TUN interface|
 |`-v /config`|All the config files including OpenVPNs reside here|
 
 See also: [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)  

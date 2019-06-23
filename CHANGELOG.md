@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.0.6 - Bugfix
+
+- Added missing `DNS` keyword to **dhcp-option** in example configs
+- Removed `ping` from client config in examples, because `keepalive` is set on a server
+
 ### 1.0.5 - Bugfix, finish hook, persistent interface, no firewall ...
 
 - Fixed bug when running hooks (#3)

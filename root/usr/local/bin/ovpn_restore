@@ -1,0 +1,24 @@
+#!/bin/bash
+
+#
+#   Restore script
+#
+#   Restores config from archive
+#
+
+# User permission fix
+if [ "$USER" != "abc" ]; then
+  RUNAS="sudo -E -u abc"
+else
+  RUNAS=""
+fi
+
+read -p "Make sure to disable current config (ovpn disconf) and remove current pki (ovpn pki remove), before you restore config. Done ? [Y/n]: " decision
+decision="$(echo $decision | tr '[:upper:]' '[:lower:]')" # Convert to lowercase
+
+# Check if operation aborted
+if [ "$decision" == "n" ] && [ "$decision" == "no" ]; then
+  exit 0
+fi
+
+$RUNAS tar -fvx $1 -C /config

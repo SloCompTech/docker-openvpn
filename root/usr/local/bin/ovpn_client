@@ -1,0 +1,156 @@
+#!/bin/bash
+
+#
+#   OpenVPN client configuration generator
+#
+
+# User permission fix
+if [ "$USER" != "abc" ]; then
+  RUNAS="sudo -E -u abc"
+else
+  RUNAS=""
+fi
+
+function usage() {
+  echo "Usage: ovpn_client COMMAND [ARGS]"
+  echo ""
+  echo "Commands:"
+  echo "  add [NAME [nopass]]             # Creates certificates for client"
+  echo "  ovpn NAME                       # Generates .ovpn file (saves to tmp)"
+  echo "  ovpnp NAME                      # Generates .ovpn file (prints it to the screen)"
+  echo "  revoke|ban NAME                 # Adds client to CRL"
+  echo "  remove|delete NAME              # Removes client config"
+}
+
+# Invalid command / help
+if [ $# -lt 1 ] || [ "$1" == "help" ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+  usage
+  exit 1
+fi
+
+function build_ovpn() {
+  if [ $# -lt 1 ]; then
+    return 1
+  fi
+
+  local OVPN_FILE="/config/tmp/$1.ovpn"
+
+  # Delete existing
+  if [ -f "$OVPN_FILE" ]; then
+    read -p ".ovpn file already exsist for $1, are you sure to overwrite it? [y/N]" decision
+    decision="$(echo $decision | tr '[:upper:]' '[:lower:]')" # Convert to lowercase
+    if [ "$decision" != "y" ] && [ "$decision" == "yes" ]; then
+      exit 0 # Don't overwrite
+    fi
+    rm $OVPN_FILE
+  fi
+
+  # Build .ovpn from client config files
+  for file in /config/openvpn/client/*.conf
+  do
+    [ -e "$file" ] || continue
+    cat $file >> $OVPN_FILE
+  done
+
+  # Find which security mechanism is openvpn using
+  local crypto=""
+  for srv_file in /config/openvpn/config/*.conf
+  do
+    crypto=`cat $srv_file | grep -E "^\\s*(secret|tls-auth|tls-crypt).*$" | cut -d" " -f1`
+    if [ -n "$crypto" ]; then
+      break
+    fi
+  done
+
+  # Add ca.crt
+  echo "<ca>" >> $OVPN_FILE
+  cat $EASYRSA_PKI/ca.crt >> $OVPN_FILE
+  echo "</ca>" >> $OVPN_FILE
+  echo "" >> $OVPN_FILE
+    
+  # Add client cert
+  echo "<cert>" >> $OVPN_FILE
+  cat $EASYRSA_PKI/issued/$1.crt >> $OVPN_FILE
+  echo "</cert>" >> $OVPN_FILE
+
+  # Add client key
+  echo "<key>" >> $OVPN_FILE
+  cat $EASYRSA_PKI/private/$1.key >> $OVPN_FILE
+  echo "</key>" >> $OVPN_FILE
+
+  # Add security mechanism specific key
+  if [ "$crypto" == "tls-crypt" ]; then
+    echo "<tls-crypt>" >> $OVPN_FILE
+    cat $EASYRSA_PKI/ta.key >> $OVPN_FILE
+    echo "</tls-crypt>" >> $OVPN_FILE
+  elif [ "$crypto" == "tls-auth" ]; then
+    echo "<tls-auth>" >> $OVPN_FILE
+    cat $EASYRSA_PKI/ta.key >> $OVPN_FILE
+    echo "</tls-auth>" >> $OVPN_FILE
+  elif [ "$crypto" == "secret" ]; then
+    echo "<secret>" >> $OVPN_FILE
+    cat $EASYRSA_PKI/secret.key >> $OVPN_FILE
+    echo "</secret>" >> $OVPN_FILE
+  fi
+
+  chown abc:abc $OVPN_FILE
+
+  if [ $# -gt 1 ] && [ "$2" == "print" ]; then
+    cat $OVPN_FILE
+  fi
+}
+
+if [ "$1" == "add" ]; then
+  if [ $# -eq 1 ]; then # No additional args
+    read -p "Common name:" commonName
+    read -p "Password protect [Y/n]: " decision
+    decision="$(echo $decision | tr '[:upper:]' '[:lower:]')" # Convert to lowercase
+    if [ "$decision" == "n" ] || [ "$decision" == "no" ]; then
+        $RUNAS easyrsa gen-req $commonName nopass
+    else
+        $RUNAS easyrsa gen-req $commonName
+    fi
+    $RUNAS easyrsa sign-req client $commonName
+  else
+      # Just build cert
+      $RUNAS easyrsa gen-req ${@:2}
+      $RUNAS easyrsa sign-req client ${@:2}
+  fi
+elif [ "$1" == "ovpn" ]; then
+  if [ $# -gt 1 ]; then
+    build_ovpn $2
+  else # Common name missing
+    usage
+    exit 1
+  fi
+elif [ "$1" == "ovpnp" ]; then
+  if [ $# -gt 1 ]; then
+    build_ovpn $2 print
+  else # Common name missing
+    usage
+    exit 1
+  fi
+elif [ "$1" = "ban" ] || [ "$1" = "revoke" ] ; then
+  if [ $# -gt 1 ]; then
+    $RUNAS easyrsa revoke ${@:2}
+    $RUNAS easyrsa gen-crl
+  else
+    usage
+    exit 1
+  fi
+elif [ "$1" = "remove" ] || [ "$1" = "delete"]; then
+  if [ $# -gt 1 ]; then
+    read -p "Are you sure to remove certs for $2 ? [y/N]: " decision
+    decision="$(echo $decision | tr '[:upper:]' '[:lower:]')" # Convert to lowercase
+    if [ "$decision" == "y" ] || [ "$decision" == "yes" ]; then
+      rm $EASYRSA_PKI/issued/$1.crt
+      rm $EASYRSA_PKI/private/$1.key
+    fi
+  else
+    usage
+    exit 1
+  fi
+else
+  usage
+  exit 1
+fi

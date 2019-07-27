@@ -68,11 +68,13 @@ services:
 
 |**Parameter**|**Function**|
 |:-----------:|:----------:|
+|`-e FAIL_MODE=hard`|Restart whole container on error|
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
-|`-e OVPN_NFW=true`|Disable any firewall related rules to be created, modified ... (must be implemented in example)|
-|`-e OVPN_PERINT=true`|Enable persistent TUN interface|
+|`-e PERSISTENT_INTERFACE=true`|Enable persistent TUN interface|
+|`-e USE_FIREWALL=false`|Disable any firewall related rules to be created, modified ... (must be implemented in example)|
 |`-v /config`|All the config files including OpenVPNs reside here|
+|`-v /log`|Log files reside here|
 
 See also: [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)  
 
@@ -104,13 +106,13 @@ If you are new to containers please see rather [Detailed first setup guide](docs
 2. At this point you will have bash shell which runs in container. Now run following commands to setup your PKI:
 
   ``` bash
-  ovpn_init [nopass] # Inits PKI
+  ovpn pki init [nopass] # Inits PKI
   ```
 
 3. Setup OpenVPN config based on example `basic_nat` with configuration wizard:  
 
   ``` bash
-  ovpn_enconf basic_nat
+  ovpn enconf basic_nat
   #Out interface [eth0]: <interface connected to the Internet>
   #Protocol udp, tcp, udp6, tcp6 [udp]:
   #VPN network [10.0.0.0]:
@@ -125,13 +127,13 @@ If you are new to containers please see rather [Detailed first setup guide](docs
 
   ``` bash
   # Generates client certificates
-  ovpn_client add <name> [nopass]
+  ovpn client add <name> [nopass]
 
-  # Generates client config file and prints it to screen (redirect to file)
-  ovpn_client ovpn <name> > <config file>.ovpn
+  # Generates client config file and saves it to /config/tmp
+  ovpn client ovpn <name>
 
   # OR BETTER SOLLUTION: Run outside container
-  docker exec -it <container name> ovpn_client ovpn <name> > <config file>.ovpn
+  docker exec -it <container name> ovpn client ovpnp <name> > <config file>.ovpn
   ```
 
 5. Exit container with `exit`, then it will destroy itself.
@@ -170,4 +172,4 @@ Wanted features (please help implement):
 
 ## Versions
 
-See [CHANGELOG](CHANGELOG.md)  
+See [CHANGELOG](CHANGELOG.md)

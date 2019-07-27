@@ -1,20 +1,6 @@
 #!/usr/bin/with-contenv bash
 
-source /app/lib/settings
-source /app/lib/utils
-
-# Check if firewall rules are disabled
-useFW
-if [ $? -eq 0 ]; then
-    # Don't use fw rules
-    exit 0
-fi
-
-# Don't run if interface persistent
-intPersistant
-if [ $? -eq 1 ]; then
-    exit 0
-fi
+source /app/hookBaseFirewall.sh
 
 #
 #   Network clear
@@ -30,4 +16,3 @@ ovpn-iptables -D FORWARD -i $OUT_INT -d $NETWORK_ADDRESS/24 -o tun0 -j ACCEPT -m
 
 # Disable NAT for VPN traffic
 ovpn-iptables -t nat -D POSTROUTING -s $NETWORK_ADDRESS/24 -o $OUT_INT -j MASQUERADE -m comment --comment "NAT traffic VPN --> Internet"
-

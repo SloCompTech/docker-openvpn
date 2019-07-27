@@ -6,76 +6,70 @@ Feel free to contribute to this project.
 
 Sections:
 
-- [Example configs & hooks](root/defaults/example/README.md) 
+- [Example configs & hooks](root/defaults/example/README.md)
 - [Guides](docs/README.md)
 - [Helper Scripts](root/app/README.md)  
 - [Modules](root/defaults/module/README.md)
 
 ## Syntax
 
-- Identation: tab (4 spaces width)
+- Identation: space (2 spaces width)
 - Javadoc style documentation
 
 ## Directory structure of project
 
 ```
-/app # Utils (part of image)
-    bin # Scripts for using this image
 /config # Configuration dir (all config is here, generated on container start)
-    openvpn # Openvpn configuration
-        ccd # Client config directory
-        client # Client configuration directory
-            <clientconffile>.conf # Base for building client config (all files merged)
-        server # Server configuration directory
-            <name>.conf # Server config files (all files merged)
-    pki
-        ca.crt # CA certificate
-        certs by serial # Certs by Serial ID
-            <serial-id-cert>.pem
-        crl.pem # CRL
-        dh.pem
-        index.txt # Database index file
-        issued
-            <name>.crt # Certificates
-        private # Directory with private keys
-            ca.key # CA secret
-            <name>.key # Certificate secrets
-        reqs # Directroy with signing requests
-        serial # The current serial number
-        ta.key # Secret for tls-auth, tls-crypt
-    ssl
-        safessl-easyrsa.cnf
-        vars
-    example # Example configs (see root/defaults/example/README.md)
-        config # Example client & server configs
-        hook # Example hook configs
-    module # Modules for openvpn
+  backup # Folder where backups are generated
+  example # Example configs (see root/defaults/example/README.md)
+  module # Modules for openvpn
+  openvpn # Openvpn configuration
+    ccd # OpenVPN client-specific configuration directory (applied when client connects)
+    client # Client configuration directory (for generation of .ovpn files)
+      <clientconffile>.conf # Base for building client config (all files merged)
+    config # Running config (server/client)
+      <name>.conf # Config files (all files merged)
     hooks # Put your custom scripts in one of subfolders
-        auth # On authentication (needs to be enabled in config)
-        client-connect # Client connected
-        client-disconnect # Client disconnected
-        down # After interface is down
-        finish # Deinit container
-        init # Init container
-        learn-address
-        route-up # After routes are added
-        route-pre-down # Before routes are removed
-        up # After interface is up  
-        tls-verify # Check certificate
+      auth # On authentication (needs to be enabled in config)
+      client-connect # Client connected
+      client-disconnect # Client disconnected
+      down # After interface is down
+      finish # Deinit container
+      init # Init container
+      learn-address
+      route-up # After routes are added
+      route-pre-down # Before routes are removed
+      up # After interface is up  
+      tls-verify # Check certificate
     system.conf # System OpenVPN config file (do not edit, unless instructed)
-    include-server.conf # File that includes all server configuration files (automatically generated)
-    donotdelete # Leave this file alone, if deleted it triggers full setup
+    include-conf.conf # File that includes all configuration files (automatically generated)
+  pki
+    ca.crt # CA certificate
+    certs by serial # Certs by Serial ID
+      <serial-id-cert>.pem
+    crl.pem # CRL
+    dh.pem
+    index.txt # Database index file
+    issued
+      <name>.crt # Certificates
+    private # Directory with private keys
+      ca.key # CA secret
+      <name>.key # Certificate secrets
+    reqs # Directroy with signing requests
+    secret.key # Static key (if not using real PKI)
+    serial # The current serial number
+    ta.key # Secret for tls-auth, tls-crypt
+  ssl
+    safessl-easyrsa.cnf
+    vars
+  tmp # Temporary folder
 /defaults # Default configuration, which is copied into config on full setup
-    example # Examples
-        config # Example configs
-        hook # Example hooks
-    module # Modules (for example password authentication ...)
-    system.conf # Original server config
+  ...
 /etc # System config
-    cont-init.d # Scripts run before services are started
-    fix-attrs.d # Fix file permissions
-    logrotate.d # Log settings
-    services.d  # Scripts that start services
+  cont-init.d # Scripts run before services are started
+  cont-finish.d # Scripts run after services are finished
+  fix-attrs.d # Fix file permissions
+  services.d  # Scripts that start services
 ```
 
 ## Useful links

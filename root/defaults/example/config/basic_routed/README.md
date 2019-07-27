@@ -3,7 +3,7 @@
 Features:  
 
 - Has configuration wizard
-- Prepared for using routing (so you will have access to LANs directly without usign NAT)
+- Prepared for using routing (so you will have access to LANs directly without using NAT)
 
 ## Configure
 

@@ -23,39 +23,31 @@ Config directory has following structure:
 
 ```
 config
-    <example name> # Directory with your examples
-        client # Directory, OpenVPN client config files
-            <name>.conf # Partial OpenVPN client config file
-        server # Directory, OpenVPN server config files
-            <name>.conf # Partial OpenVPN server config file
-        hooks # Directory with hooks for this example
-            <hook name> # Directory, name of hook
-                <scripts> # Executable scripts
-        wizard # Setup script, run on `ovpn_enconf` command.
-        Readme.md # Info about example, what to configure
+  <example name> # Directory with your examples
+    client # Directory, OpenVPN client config files
+      <name>.conf # Partial OpenVPN client config file
+    server # Directory, OpenVPN server config files
+      <name>.conf # Partial OpenVPN server config file
+    hooks # Directory with hooks for this example
+      <hook name> # Directory, name of hook
+        <scripts> # Executable scripts
+    wizard # Setup script, run on `ovpn_enconf` command.
+    Readme.md # Info about example, what to configure
 ```
 
 ### Hooks
 
 - start hook file with
 
-    ``` bash
-    #!/usr/bin/with-contenv bash
-
-    source /app/lib/settings
-    source /app/lib/utils
-    ```
+  ``` bash
+  #!/usr/bin/with-contenv bash
+  ```
 
 - if hooks call any **firewall** related commands add after above code and before any commands
 
-    ``` bash
-    # Check if firewall rules are disabled
-    useFW
-    if [ $? -eq 0 ]; then
-        # Don't use fw rules
-        exit 0
-    fi
-    ```
+  ``` bash
+  source /app/hookBaseFirewall.sh
+  ```
 
 - also check the examples how persistent interface is handled, so you don't create iptables mess (running init, up script once, never call down, finish)
 
@@ -70,16 +62,16 @@ config
 ### Wizard
 
 Wizard is script that helps user to simply configure your example to his needs.
-User will call `ovpn_enconf CONFIG_NAME [wizard args]` to load your example in server config.  
+User will call `ovpn enconf CONFIG_NAME [wizard args]` to load your example in server config.  
 
 Then there are two options:
 
 1. User manualy configure settings in `/config/openvpn` folder
 2. Your **wizard** script, configures files which will be copied to `/config/openvpn`
-    - Configuration files are copied to temporary location (so they can be modified)
-    - `wizard` script will be called with temporary location as first argument `$1` (folder has same structure as in examples)
-    - Your `wizard` script **MUST** only modify files in temporary location.
-    - When your wizard exits with code 0, files are copied from temporary location to config folder.
+  - Configuration files are copied to temporary location (so they can be modified)
+  - `wizard` script will be called with temporary location as first argument `$1` (folder has same structure as in examples)
+  - Your `wizard` script **MUST** only modify files in temporary location.
+  - When your wizard exits with code 0, files are copied from temporary location to config folder.
 
 ## General hooks
 
@@ -90,8 +82,8 @@ Hooks are located in `hook` directory. Please follow hook guidelines:
 
 - File name: **hook_\<identifier\>**  
 - At the top of the script
-    - Optionaly copyright notice
-    - What this hook does
-    - Setttings with comments and an example settings values
+  - Optionaly copyright notice
+  - What this hook does
+  - Setttings with comments and an example settings values
 
 **Note:** All hooks run as non-root user so instead of using `ip` and `iptables` use `ovpn-ip`, `ovpn-iptables`, `ovpn-ip6tables` (see [/root/usr/local/sbin](/usr/local/sbin)).

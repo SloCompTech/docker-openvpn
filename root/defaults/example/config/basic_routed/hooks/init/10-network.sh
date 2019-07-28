@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bash
 
-source /app/hookBaseFirewall.sh
+source /app/hookBaseFirewallSetup.sh
 
 #
 #   Network initialization

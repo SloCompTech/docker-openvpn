@@ -87,6 +87,3 @@ RUN apk add --no-cache \
 
 # Add repo files to image
 COPY root/ /
-
-# Configure
-RUN chmod -R 0644 /etc/logrotate.d

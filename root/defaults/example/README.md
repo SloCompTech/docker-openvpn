@@ -26,7 +26,7 @@ config
   <example name> # Directory with your examples
     client # Directory, OpenVPN client config files
       <name>.conf # Partial OpenVPN client config file
-    server # Directory, OpenVPN server config files
+    config # Directory, OpenVPN server config files
       <name>.conf # Partial OpenVPN server config file
     hooks # Directory with hooks for this example
       <hook name> # Directory, name of hook

@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bash
 
-if [ ! -d "/config/openvpn " ] || [ ! -f "/config/openvpn/system.conf" ]; then
+if [ ! -d "/config/openvpn" ] || [ ! -f "/config/openvpn/system.conf" ]; then
   echo "System configuration is missing"
   if [ "$FAIL_MODE" != "hard" ]; then
     # Do nothing until container restart

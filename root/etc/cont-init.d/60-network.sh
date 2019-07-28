@@ -25,7 +25,7 @@ if [ -n "$(cat /proc/net/dev | grep tun0)" ] && { [ -z "$PERSISTENT_INTERFACE" ]
 fi
 
 # Create tunnel interface
-if [ -n "$(cat /proc/net/dev | grep tun0)" ]; then
+if [ -z "$(cat /proc/net/dev | grep tun0)" ]; then
 	echo "Creating tun0 interface"
 	openvpn --mktun --dev tun0 --dev-type tun --user abc --group abc
 fi

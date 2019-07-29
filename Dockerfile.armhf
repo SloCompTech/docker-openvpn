@@ -2,7 +2,7 @@
 # Base image
 # @see https://github.com/SloCompTech/docker-baseimage
 #
-FROM slocomptech/baseimage:alpine
+FROM slocomptech/baseimage:alpine-armhf
 
 # Build arguments
 ARG BUILD_DATE

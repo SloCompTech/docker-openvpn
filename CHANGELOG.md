@@ -10,6 +10,8 @@
 - Hiearhicaly moved all commands under the hood of `ovpn` command
 - Improved backup command
 - Added restore command
+- Changed base image
+- Added **armhf** build
 
 ### 1.0.6 - Bugfix
 

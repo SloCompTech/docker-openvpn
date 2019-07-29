@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#
+#   Disables OpenVPN config
+#   WARNING: This deletes active OpenVPN config & active hooks
+#
+
+# Check if OpenVPN config directory exsist
+config_path="/config/openvpn"
+if [ ! -d "$config_path" ]; then
+  exit 0
+fi
+
+# Display notice
+echo "This script will clear your configuration (whole openvpn directory)."
+echo "Please make sure that you backed up you config and active hooks."
+
+# Make sure that user understands
+read -p "Are you sure, you want to delete active config and hooks ? [y/N]:" decision
+decision="$(echo $decision | tr '[:upper:]' '[:lower:]')" # Convert to lowercase
+
+# Check if operation aborted
+if [ "$decision" != "y" ] && [ "$decision" != "yes" ]; then
+  exit 0
+fi
+
+# Delete config
+if [ -d "$config_path/config" ]; then
+  rm -rf $config_path/config/*
+fi
+
+# Delete client config
+if [ -d "$config_path/client" ]; then
+  rm -rf $config_path/client/*
+fi
+
+# Delete hook scripts
+if [ -d "$config_path/hooks" ]; then
+  rm -rf $config_path/hooks/*/*
+fi

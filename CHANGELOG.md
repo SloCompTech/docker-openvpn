@@ -1,5 +1,18 @@
 # Changelog
 
+### 2.0.0 - Partial rewrite
+
+- Moved `/config/hooks` to `/config/openvpn/hooks`
+- Renamed `/config/openvpn/server` to `config`
+- Changed base image to [slocomptech/baseimage-alpine](https://github.com/SloCompTech/docker-baseimage-alpine)
+- Moved all helper scripts to `/root/usr/local/bin`
+- Got rid of bash lib files
+- Hiearhicaly moved all commands under the hood of `ovpn` command
+- Improved backup command
+- Added restore command
+- Changed base image
+- Added **armhf** build
+
 ### 1.0.6 - Bugfix
 
 - Added missing `DNS` keyword to **dhcp-option** in example configs

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#
+#   Backup script
+#
+#   Backups to /config/backup
+#
+
+BACKUP_DIRS=(openvpn pki ssl)
+ARCHIVE_NAME="/config/backup/ovpn_backup_$(date +%Y%m%d%H%M%S).tar.gz"
+
+cd /config && tar cfvz $ARCHIVE_NAME ${BACKUP_DIRS[@]}
+if [ "$USER" != "abc" ]; then
+  chown abc:abc $ARCHIVE_NAME # Fix backup archive permissions
+fi

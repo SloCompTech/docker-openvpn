@@ -1,17 +1,31 @@
 #!/usr/bin/with-contenv bash
 
-CONFIGS=$(ls -1 /config/openvpn/server | wc -l) # Get number of files in /config/openvpn/server
-if [ $CONFIGS -gt 0 ]; then
-    # Run OpenVPN server only if configs are present
-    echo "Running OpenVPN ..."
-    sudo -E -u abc openvpn --cd /config --config ${OVPN_RUN}
-else
-    # No OpenVPN config present
-    echo "No OpenVPN config present"
-    
+if [ ! -d "/config/openvpn" ] || [ ! -f "/config/openvpn/system.conf" ]; then
+  echo "System configuration is missing"
+  if [ "$FAIL_MODE" != "hard" ]; then
     # Do nothing until container restart
     while true
     do
-        sleep 3600
+      sleep 3600
     done
+  fi
+  exit 1
+fi
+
+CONFIGS=$(ls -1 /config/openvpn/config | wc -l) # Get number of files
+if [ $CONFIGS -gt 0 ]; then
+  # Run OpenVPN only if configs are present
+  echo "Running OpenVPN ..."
+  sudo -E -u abc openvpn --config /config/openvpn/system.conf
+else
+  # No OpenVPN config present
+  echo "No OpenVPN config present"
+  if [ "$FAIL_MODE" != "hard" ]; then
+    # Do nothing until container restart
+    while true
+    do
+      sleep 3600
+    done
+  fi
+  exit 1
 fi

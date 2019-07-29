@@ -1,0 +1,28 @@
+#
+#		Set static options for client
+#		@see https://community.openvpn.net/openvpn/wiki/Openvpn24ManPage
+#
+
+# Disable client (prevent from connecting, for security compromise REVOKE client)
+# disable
+
+# Client Static IP
+# ifconfig-push IP_ADDRESS MASK
+
+# Generate routes through this client when connects
+# iroute NETWORK [NETMASK]
+
+# Don't inherit global push settings
+# push-reset
+
+# Push option to client
+# push OPTION
+
+# Remove option from client
+# push-remove OPTION
+
+# Client Static IPv6
+# ifconfig-ipv6-push ADDRESS/CIDR REMOTE
+
+# Route through client
+# iroute-ipv6 ADDRESS/CIDR

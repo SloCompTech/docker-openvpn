@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#
+#	  OpenVPN utils
+#
+
+function usage() {
+  echo "Usage: ovpn COMMAND [ARGS..]"
+  echo ""
+  echo "Commands:"
+  echo "  backup                                            # Creates backup of configuration files"
+  echo "  client [add|ovpn|ovpnp|ban|revoke|remove|delete|help] [NAME] [nopass] # Client manipulation"
+  echo "  disconf                                           # Deletes active config"
+  echo "  enconf  EXAMPLE_CONFIG_NAME [wizard args]         # Enable example config"
+  echo "  pki [init|remove|delete]                          # Public Key Intrastructure"
+  echo "  restore ARCHIVE_FILE                              # Restores backup"
+}
+
+if [ $# -lt 1 ] || [ "$1" == "help" ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+  usage
+  exit 1
+fi
+
+# Run selected command
+cmd="$(echo $1 | tr '[:upper:]' '[:lower:]')" # Convert to lowercase
+if [ "$cmd" == "backup" ]; then
+  ovpn_backup ${@:2}
+elif [ "$cmd" == "client" ]; then
+  ovpn_client ${@:2}
+elif [ "$cmd" == "disconf" ]; then
+  ovpn_disconf ${@:2}
+elif [ "$cmd" == "enconf" ]; then
+  ovpn_enconf ${@:2}
+elif [ "$cmd" == "pki" ]; then
+  ovpn_pki ${@:2}
+elif [ "$cmd" == "restore"]; then
+  ovpn_restore ${@:2}
+else
+  usage
+  exit 1
+fi

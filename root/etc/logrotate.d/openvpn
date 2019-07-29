@@ -1,9 +1,0 @@
-/config/log/openvpn.log {
-    weekly
-    rotate 7
-    missingok
-    compress
-    delaycompress
-    nodateext
-    su abc abc
-}

@@ -144,6 +144,10 @@ For more infromation see:
 - **configuration example directory** (for more info about example)  
 - [Contributing](CONTRIBUTING.md) (for explanation how container works, how to write an example config ...)  
 
+### Client mode
+
+Just put *.ovpn* file in `/config/openvpn/config` and restart container.
+
 ## Troubleshooting
 
 - [OpenVPN troubleshoot guide](https://community.openvpn.net/openvpn/wiki/HOWTO#Troubleshooting)  

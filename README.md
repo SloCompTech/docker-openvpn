@@ -152,6 +152,10 @@ Just put *.ovpn* file in `/config/openvpn/config` and restart container.
 
 - [OpenVPN troubleshoot guide](https://community.openvpn.net/openvpn/wiki/HOWTO#Troubleshooting)  
 
+### Cannot ioctl TUNSETIFF tun0: Operation not permitted (errno=1)
+
+Just manualy remove **tun0**  manually `openvpn --rmtun --dev tun0`.
+
 ## Contribute
 
 Feel free to contribute new features to this container, but first see [Contribute Guide](CONTRIBUTING.md).

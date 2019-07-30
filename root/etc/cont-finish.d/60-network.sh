@@ -5,7 +5,7 @@
 #
 
 # Delete tunnel interface (if not persistant)
-if [ -n "$(cat /proc/net/dev | grep tun0)" ] && { [ -z "$PERSISTENT_INTERFACE" ] || [ "$PERSISTENT_INTERFACE" != "true" ]; }; then
-  echo "Removing tun0 interface"
-	openvpn --rmtun --dev tun0
+if [ -n "$(cat /proc/net/dev | grep $TUNNEL_INTERFACE)" ] && { [ -z "$PERSISTENT_INTERFACE" ] || [ "$PERSISTENT_INTERFACE" != "true" ]; }; then
+  echo "Removing $TUNNEL_INTERFACE interface"
+	openvpn --rmtun --dev $TUNNEL_INTERFACE
 fi

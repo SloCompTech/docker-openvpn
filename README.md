@@ -70,6 +70,7 @@ services:
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-e PERSISTENT_INTERFACE=true`|Enable persistent TUN interface|
+|`-e TUNNEL_INTERFACE="tun0"`|Tunnel interface name (default: tun0)|
 |`-e USE_FIREWALL=false`|Disable any firewall related rules to be created, modified ... (must be implemented in example)|
 |`-v /config`|All the config files including OpenVPNs reside here|
 |`-v /log`|Log files reside here|
@@ -151,6 +152,10 @@ Just put *.ovpn* file in `/config/openvpn/config` and restart container.
 ## Troubleshooting
 
 - [OpenVPN troubleshoot guide](https://community.openvpn.net/openvpn/wiki/HOWTO#Troubleshooting)  
+
+### Cannot ioctl TUNSETIFF tun0: Operation not permitted (errno=1)
+
+Just manualy remove **tun0**  manually `openvpn --rmtun --dev tun0`.
 
 ## Contribute
 

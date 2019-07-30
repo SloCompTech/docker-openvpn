@@ -19,13 +19,13 @@ if [ ! -c "/dev/net/tun" ]; then
 fi
 
 # Remove existing interface if not persistent interface selected
-if [ -n "$(cat /proc/net/dev | grep tun0)" ] && { [ -z "$PERSISTENT_INTERFACE" ]  ||  [ "$PERSISTENT_INTERFACE" != "true" ]; }; then
-  echo "Removing tun0 interface"
-	openvpn --rmtun --dev tun0
+if [ -n "$(cat /proc/net/dev | grep $TUNNEL_INTERFACE)" ] && { [ -z "$PERSISTENT_INTERFACE" ]  ||  [ "$PERSISTENT_INTERFACE" != "true" ]; }; then
+  echo "Removing $TUNNEL_INTERFACE interface"
+	openvpn --rmtun --dev $TUNNEL_INTERFACE
 fi
 
 # Create tunnel interface
-if [ -z "$(cat /proc/net/dev | grep tun0)" ]; then
-	echo "Creating tun0 interface"
-	openvpn --mktun --dev tun0 --dev-type tun --user abc --group abc
+if [ -z "$(cat /proc/net/dev | grep $TUNNEL_INTERFACE)" ]; then
+	echo "Creating $TUNNEL_INTERFACE interface"
+	openvpn --mktun --dev $TUNNEL_INTERFACE --dev-type tun --user $CONTAINER_USER --group $CONTAINER_USER
 fi

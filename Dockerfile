@@ -43,7 +43,8 @@ ENV EASYRSA=/usr/share/easy-rsa \
     EASYRSA_VARS_FILE=/config/ssl/vars \
     #EASYRSA_SSL_CONF=/config/ssl/openssl-easyrsa.cnf \
     EASYRSA_SAFE_CONF=/config/ssl/safessl-easyrsa.cnf \
-    EASYRSA_TEMP_FILE=/config/tmp/temp
+    EASYRSA_TEMP_FILE=/config/tmp/temp \
+    TUNNEL_INTERFACE="tun0"
 
 # Install packages
 RUN apk add --no-cache \

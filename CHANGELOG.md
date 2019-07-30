@@ -1,5 +1,10 @@
 # Changelog
 
+### 2.0.2 - Added multi-instance support
+
+- Added `TUNNEL_INTERFACE` to set interface name (in case of multiple containers)
+- Some fixes for general user
+
 ### 2.0.1 - Fix service start
 
 - Fixed command for starting service

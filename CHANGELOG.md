@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.0.1 - Fix service start
+
+- Fixed command for starting service
+
 ### 2.0.0 - Partial rewrite
 
 - Moved `/config/hooks` to `/config/openvpn/hooks`

@@ -16,7 +16,7 @@ CONFIGS=$(ls -1 /config/openvpn/config | wc -l) # Get number of files
 if [ $CONFIGS -gt 0 ]; then
   # Run OpenVPN only if configs are present
   echo "Running OpenVPN ..."
-  sudo -E -u abc openvpn --config /config/openvpn/system.conf
+  exec s6-setuidgid $CONTAINER_USER openvpn --config /config/openvpn/system.conf
 else
   # No OpenVPN config present
   echo "No OpenVPN config present"

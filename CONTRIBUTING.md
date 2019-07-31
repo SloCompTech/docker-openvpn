@@ -42,7 +42,9 @@ Sections:
       up # After interface is up  
       tls-verify # Check certificate
     system.conf # System OpenVPN config file (do not edit, unless instructed)
-    include-conf.conf # File that includes all configuration files (automatically generated)
+    system-server.conf # System OpenCPN server specific file (do not edit, unless instructed)
+    system-client.conf # System OpenCPN client specific file (do not edit, unless instructed)
+    dynamic.conf # File that links all config files together (automatically generated)
   pki
     ca.crt # CA certificate
     certs by serial # Certs by Serial ID

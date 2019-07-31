@@ -67,6 +67,7 @@ services:
 |**Parameter**|**Function**|
 |:-----------:|:----------:|
 |`-e FAIL_MODE=hard`|Restart whole container on error|
+|`-e MODE=client`|Set docker mode (valid values: *empty*,server,client; default: server), set to client in case you use container as client|
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-e PERSISTENT_INTERFACE=true`|Enable persistent TUN interface|
@@ -147,7 +148,14 @@ For more infromation see:
 
 ### Client mode
 
-Just put *.ovpn* file in `/config/openvpn/config` and restart container.
+1. Run container to get config structure `docker run -it --rm -v PATH:/config slocomptech/openvpn`.
+2. Make sure you **don't** have following options specified in your *.ovpn* file
+  -  dev
+  - user
+  - group
+  - anything that is already specified in *system.conf*
+3. Put *.ovpn* file in `config/openvpn/config` in your volume.
+4. Start conatiner with `-e MODE=client`. 
 
 ## Troubleshooting
 

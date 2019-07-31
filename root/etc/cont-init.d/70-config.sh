@@ -4,7 +4,9 @@
 #	Dynamic OpenVPN configs
 #
 
+CLIENT_FILE=/config/openvpn/system-client.conf
 DYNAMIC_FILE=/config/openvpn/dynamic.conf
+SERVER_FILE=/config/openvpn/system-server.conf
 
 # Build link file
 echo "#" > $DYNAMIC_FILE
@@ -18,12 +20,25 @@ echo "# Interface" >> $DYNAMIC_FILE
 echo "dev $TUNNEL_INTERFACE" >> $DYNAMIC_FILE
 echo "" >> $DYNAMIC_FILE
 
+# Include mode specific configuration
+if { [ -z "$MODE" ] || [ "$MODE" == "server" ]; } && [ -f "$SERVER_FILE" ]; then
+	echo "# Server specific configuration" >> $DYNAMIC_FILE
+	echo "config $SERVER_FILE" >> $DYNAMIC_FILE
+	echo "" >> $DYNAMIC_FILE
+elif [ "$MODE" == "client" ] && [ -f "$CLIENT_FILE" ]; then
+	echo "# Client specific configuration" >> $DYNAMIC_FILE
+	echo "config $CLIENT_FILE" >> $DYNAMIC_FILE
+	echo "" >> $DYNAMIC_FILE
+fi
+
 # Include all configuration files
+echo "# Configuration files" >> $DYNAMIC_FILE
 for file in /config/openvpn/config/*
 do
 	[ -e "$file" ] || continue
 
 	echo "config $file" >> $DYNAMIC_FILE
 done
+echo "" >> $DYNAMIC_FILE
 
 chown $CONTAINER_USER:$CONTAINER_USER $DYNAMIC_FILE

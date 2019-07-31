@@ -1,5 +1,12 @@
 # Changelog
 
+### 2.0.3 - Improved IPv6 support & finalized client mode support
+
+- Added some IPv6 settings to examples
+- Sleep interval on crash
+- Outsourced server specific config to `system-server.conf`
+- Added parameter `MODE` so you can choose **client** mode instead of server (to not include server specific options)
+
 ### 2.0.2 - Added multi-instance support
 
 - Added `TUNNEL_INTERFACE` to set interface name (in case of multiple containers)

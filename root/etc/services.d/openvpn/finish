@@ -6,4 +6,6 @@
 
 if [ "$FAIL_MODE" == "hard" ]; then
 	exec s6-svscanctl -t /var/run/s6/services
+else
+	sleep 5
 fi

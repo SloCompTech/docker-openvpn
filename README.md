@@ -68,6 +68,7 @@ services:
 |:-----------:|:----------:|
 |`-e FAIL_MODE=hard`|Restart whole container on error|
 |`-e MODE=client`|Set docker mode (valid values: *empty*,server,client; default: server), set to client in case you use container as client|
+|`-e NO_CHOWN=true`|Disable permission fixing.|
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-e PERSISTENT_INTERFACE=true`|Enable persistent TUN interface|

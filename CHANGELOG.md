@@ -1,5 +1,12 @@
 # Changelog
 
+### 2.0.6 - Fixed bugs, added additonal parameters
+
+- Fixed bug in `ovpn` util.
+- Moved `tmp-dir` to server related config.
+- Fixed bug in dockumentation (GUID -> PGID).
+- Added `SKIP_APP` parameter (to skip app startup).
+
 ### 2.0.3 - Improved IPv6 support & finalized client mode support
 
 - Added some IPv6 settings to examples

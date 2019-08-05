@@ -71,6 +71,7 @@ services:
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-e PERSISTENT_INTERFACE=true`|Enable persistent TUN interface|
+|`-e SKIP_APP=true`|Skip app startup|
 |`-e TUNNEL_INTERFACE="tun0"`|Tunnel interface name (default: tun0)|
 |`-e USE_FIREWALL=false`|Disable any firewall related rules to be created, modified ... (must be implemented in example)|
 |`-v /config`|All the config files including OpenVPNs reside here|

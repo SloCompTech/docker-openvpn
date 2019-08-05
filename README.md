@@ -24,7 +24,7 @@ docker run \
   --name=ovpn \
   --cap-add NET_ADMIN \
   -e PUID=1000 \
-  -e GUID=1000 \
+  -e PGID=1000 \
   -p 1194:1194/udp \
   -v </path/o/config>:/config \
   --restart=unless-stopped \
@@ -49,7 +49,7 @@ services:
       - ./data:/config
     environment:
       - PUID=1000
-      - PGUID=1000
+      - PGID=1000
     restart: on-failure
     # If you want to build from source add build:
     build:

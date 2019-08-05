@@ -33,7 +33,7 @@ elif [ "$cmd" == "enconf" ]; then
   ovpn_enconf ${@:2}
 elif [ "$cmd" == "pki" ]; then
   ovpn_pki ${@:2}
-elif [ "$cmd" == "restore"]; then
+elif [ "$cmd" == "restore" ]; then
   ovpn_restore ${@:2}
 else
   usage

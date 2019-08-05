@@ -93,7 +93,7 @@ function build_ovpn() {
     echo "</secret>" >> $OVPN_FILE
   fi
 
-  chown abc:abc $OVPN_FILE
+  [ -n "$NO_CHOWN" ] || chown abc:abc $OVPN_FILE
 
   if [ $# -gt 1 ] && [ "$2" == "print" ]; then
     cat $OVPN_FILE

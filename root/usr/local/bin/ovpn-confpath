@@ -1,0 +1,17 @@
+#!/usr/bin/with-contenv bash
+#
+# Prints OpenVPN config name
+#
+
+# Check default openvpn.conf
+if [ -f "$OPENVPN_DIR/openvpn.conf" ]; then
+  echo 'openvpn.conf'
+  exit 0
+fi
+
+for file in $OPENVPN_DIR/*.ovpn
+do
+  [ -f "$file" ] || continue
+  echo $(basename $file)
+  exit 0
+done

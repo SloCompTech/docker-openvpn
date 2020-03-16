@@ -1,41 +1,47 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
+#
+# Utility script
+#
 
-#
-#	  OpenVPN utils
-#
+set -e
 
 function usage() {
-  echo "Usage: ovpn COMMAND [ARGS..]"
-  echo ""
-  echo "Commands:"
-  echo "  backup                                            # Creates backup of configuration files"
-  echo "  client [add|ovpn|ovpnp|ban|revoke|remove|delete|help] [NAME] [nopass] # Client manipulation"
-  echo "  disconf                                           # Deletes active config"
-  echo "  enconf  EXAMPLE_CONFIG_NAME [wizard args]         # Enable example config"
-  echo "  pki [init|remove|delete]                          # Public Key Intrastructure"
-  echo "  restore ARCHIVE_FILE                              # Restores backup"
+  echo 'Usage: ovpn COMMAND [ARGS..]'
+  echo ''
+  echo 'Commands:'
+  echo '  backup [file] # Backup config (Default location: /config/backup)'
+  echo '  pki crl # Updates CRL'
+  echo '      init [nopass] # Inits PKI with CA (env MODULUS=... for dh.pem modulus)'
+  echo '      reflect # Sync OpenVPN with PKI'
+  echo '      run CMD # Run easyrsa command'
+  echo '      rm|del  # Remove PKI'
+  echo '  restore [file] # Restore config'
+  echo '  subject add SUBNAME # TODO'
+  echo '          gen-ovpn SUBNAME [file] # Generate .ovpn file'
+  echo '          gen-pkg SUBNAME [file] # Generate config package'
+  echo '          import-req FILE # Import signing request'
+  echo '          renew SUBNAME # TODO'
+  echo '          revoke SUBNAME'
+  echo '          set SUBNAME OPTION [ARGS]'
 }
 
-if [ $# -lt 1 ] || [ "$1" == "help" ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
-  usage
-  exit 1
-fi
+# Lowercase command
+command="$(echo $1 | tr '[:upper:]' '[:lower:]')"
 
-# Run selected command
-cmd="$(echo $1 | tr '[:upper:]' '[:lower:]')" # Convert to lowercase
-if [ "$cmd" == "backup" ]; then
-  ovpn_backup ${@:2}
-elif [ "$cmd" == "client" ]; then
-  ovpn_client ${@:2}
-elif [ "$cmd" == "disconf" ]; then
-  ovpn_disconf ${@:2}
-elif [ "$cmd" == "enconf" ]; then
-  ovpn_enconf ${@:2}
-elif [ "$cmd" == "pki" ]; then
-  ovpn_pki ${@:2}
-elif [ "$cmd" == "restore" ]; then
-  ovpn_restore ${@:2}
-else
-  usage
-  exit 1
-fi
+case "$command" in
+  backup)
+    exec ovpn-backup ${@:2}
+    ;;
+  pki)
+    exec ovpn-pki ${@:2}
+    ;;
+  restore)
+    exec ovpn-restore ${@:2}
+    ;;
+  subject)
+    exec ovpn-subject ${@:2}
+    ;;
+  *)
+    usage
+    ;;
+esac

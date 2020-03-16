@@ -1,0 +1,17 @@
+#!/usr/bin/with-contenv bash
+#
+# Backup utility
+#
+
+set -e
+
+source $CONTAINER_VARS_FILE
+
+if [ -n "$1" ]; then
+  FILE=$1
+else
+  FILE=$BACKUP_DIR/openvpn_$(date +%Y%m%d%H%M%S).bck.tar.gz
+fi
+
+$RUNCMD tar -C /config --exclude=backup -cvzf $FILE .
+echo "Configuration backed up in $FILE"

@@ -1,11 +1,23 @@
 #!/usr/bin/with-contenv bash
 
 #
-#   Network setup
+# Cleanup tunnel drivers
 #
 
+if [ -n "$SKIP_APP" ]; then
+  exit 0
+fi
+
+config="$(ovpn-confpath)"
+
+device="$(cat $OPENVPN_DIR/$config | sed -n -re 's/^\s*dev\s*(\w+)\s*$/\1/p')"
+if [ -z "$device" ]; then
+	echo 'Interface not set'
+	exit 1
+fi
+
 # Delete tunnel interface (if not persistant)
-if [ -n "$(cat /proc/net/dev | grep $TUNNEL_INTERFACE)" ] && { [ -z "$PERSISTENT_INTERFACE" ] || [ "$PERSISTENT_INTERFACE" != "true" ]; }; then
-  echo "Removing $TUNNEL_INTERFACE interface"
-	openvpn --rmtun --dev $TUNNEL_INTERFACE
+if [ -n "$(cat /proc/net/dev | grep $device)" ] && [ ! -f "/config/persistent-interface" ] then
+  echo "Removing $device interface"
+	openvpn --rmtun --dev $device
 fi

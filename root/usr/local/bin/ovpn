@@ -13,16 +13,16 @@ function usage() {
   echo '  pki crl # Updates CRL'
   echo '      init [nopass] # Inits PKI with CA (env MODULUS=... for dh.pem modulus)'
   echo '      reflect # Sync OpenVPN with PKI'
-  echo '      run CMD # Run easyrsa command'
   echo '      rm|del  # Remove PKI'
   echo '  restore [file] # Restore config'
-  echo '  subject add SUBNAME # TODO'
+  echo '  subject add NAME {client|server} [nopass] [easy-rsa args]'
   echo '          gen-ovpn SUBNAME [file] # Generate .ovpn file'
   echo '          gen-pkg SUBNAME [file] # Generate config package'
   echo '          import-req FILE # Import signing request'
-  echo '          renew SUBNAME # TODO'
+  echo '          renew SUBNAME {client|server} [easy-rsa args]'
   echo '          revoke SUBNAME'
   echo '          set SUBNAME OPTION [ARGS]'
+  echo '                      ip IP # Only works on server with configured server options'
 }
 
 # Lowercase command

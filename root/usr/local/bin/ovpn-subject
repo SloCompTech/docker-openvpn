@@ -4,6 +4,7 @@
 #
 
 set -e
+source $CONTAINER_VARS_FILE
 
 # Lowercase command
 command="$(echo $1 | tr '[:upper:]' '[:lower:]')"
@@ -19,6 +20,11 @@ fi
 # @param $2 file (optional)
 #
 function generate_ovpn() {
+  if [ $# -le 1 ]; then
+    echo 'Invalid common name'
+    exit 1
+  fi
+
   # .ovpn protection
   OVPN_FILE=${$2:="/config/client-configs/$1.ovpn"}
   if [ -f "$OVPN_FILE" ]; then
@@ -66,6 +72,8 @@ function generate_ovpn() {
         $RUNCMD cat $EASYRSA_PKI/ta.key >> $OVPN_FILE
         $RUNCMD echo '</tls-crypt>' >> $OVPN_FILE
       elif [ "$crypto" == 'tls-auth' ]; then
+        $RUNCMD echo '# Note: If this is server config replace 1 with 0' >> $OVPN_FILE
+        $RUNCMD echo 'key-direction 1' >> $OVPN_FILE
         $RUNCMD echo '<tls-auth>' >> $OVPN_FILE
         $RUNCMD cat $EASYRSA_PKI/ta.key >> $OVPN_FILE
         $RUNCMD echo '</tls-auth>' >> $OVPN_FILE
@@ -86,13 +94,20 @@ function generate_ovpn() {
 # @param $2 file (optional)
 #
 function generate_pkg() {
+  if [ $# -le 1 ]; then
+    echo 'Invalid common name'
+    exit 1
+  fi
+
   # Create temporary directory for building
   TMP_DIR=/config/tmp/pkg
   TMP_CONFIG=$TMP_DIR/openvpn/openvpn.conf
   if [ -d "$TMP_DIR" ]; then
-    rm -r $TMP_DIR
+    rm -r $TMP_DIR/*
+  else
+    mkdir -p $TMP_DIR
   fi
-  mkdir -p $TMP_DIR
+  
 
   # pkg file protection
   PKG_FILE=${$2:="/config/client-configs/$1.pkg.tar.gz"}
@@ -112,6 +127,7 @@ function generate_pkg() {
   else
     $RUNCMD touch $TMP_CONFIG
   fi
+  echo '# Auto-generated config' >> $TMP_CONFIG
 
   # Add CA certificate
   $RUNCMD cp $EASYRSA_PKI/ca.crt $TMP_DIR/openvpn
@@ -126,12 +142,13 @@ function generate_pkg() {
     $RUNCMD cp $EASYRSA_PKI/private/$1.key $TMP_DIR/openvpn
     $RUNCMD echo "key $1.key" >> $TMP_CONFIG
   else
+    $RUNCMD echo "#key $1.key" >> $TMP_CONFIG
     echo 'Client private key not added (sign only mode), please add it manualy via --key or <key>...</key>'
   fi
 
   # Add TLS key if specified in client template config
   srv_file=$(ovpn-confpath)
-  crypto=`cat $srv_file | grep -E "^\\s*(secret|tls-auth|tls-crypt).*$" | cut -d" " -f1`
+  crypto=`cat $OPENVPN_DIR/$srv_file | grep -E "^\\s*(secret|tls-auth|tls-crypt).*$" | cut -d" " -f1`
   if [ -n "$crypto" ]; then
     read -r -p "Add --$crypto to .ovpn? [Y/n] " response
     if [[ ! "$response" =~ ^[Nn] ]]; then
@@ -140,6 +157,7 @@ function generate_pkg() {
         $RUNCMD echo 'tls-crypt ta.key' >> $TMP_CONFIG
       elif [ "$crypto" == 'tls-auth' ]; then
         $RUNCMD cp $EASYRSA_PKI/ta.key $TMP_DIR/openvpn
+        $RUNCMD echo '# Note: If this is server config replace 1 with 0' >> $TMP_CONFIG
         $RUNCMD echo 'tls-auth 1 ta.key' >> $TMP_CONFIG
       elif [ "$crypto" == "secret" ]; then
         $RUNCMD cat $EASYRSA_PKI/secret.key $TMP_DIR/openvpn
@@ -160,6 +178,12 @@ function generate_pkg() {
 # @param $3+ easy-rsa gen-req args
 #
 function subject_add() {
+  if [ $# -le 2 ]; then
+    echo 'Invalid arguments: COMMONNAME TYPE [EASYRSA_ARGS]'
+    echo 'Available types: client, server'
+    exit 1
+  fi
+
   case "$2" in
     client)
       # Check if certificate already exist
@@ -208,7 +232,6 @@ function subject_add() {
       ;;
     *)
       echo 'Invalid subject type'
-      echo 'Available types: client, server'
       ;;
   esac
 }
@@ -218,7 +241,11 @@ function subject_add() {
 # @param $1 .req file path
 #
 function subject_importreq() {
-
+  if [ $# -le 1 ]; then
+    echo 'Invalid file'
+    exit 1
+  fi
+  $RUNCMD easyrsa import-req ${@:1}
 }
 
 #
@@ -228,13 +255,20 @@ function subject_importreq() {
 # @param $3+ easy-rsa gen-req args
 #
 function subject_renew() {
-  # Check if signing request already exist
-  if [ ! -f "$EASYRSA_PKI/reqs/$1.req" ]; then
-    echo 'Signing request missing'
-    exit 3
+  if [ $# -le 2 ]; then
+    echo 'Invalid arguments: COMMONNAME TYPE [EASYRSA_ARGS]'
+    echo 'Available types: client, server'
+    exit 1
   fi
+
   case "$2" in
     client)
+      # Check if signing request already exist
+      if [ ! -f "$EASYRSA_PKI/reqs/$1.req" ]; then
+        echo 'Signing request missing'
+        exit 3
+      fi
+
       $RUNCMD easyrsa sign-req client $1
       echo "Public key: $EASYRSA_PKI/issued/$1.crt"
       echo "Private key: $EASYRSA_PKI/private/$1.key"
@@ -246,6 +280,12 @@ function subject_renew() {
       fi
       ;;
     server)
+      # Check if signing request already exist
+      if [ ! -f "$EASYRSA_PKI/reqs/$1.req" ]; then
+        echo 'Signing request missing'
+        exit 3
+      fi
+
       $RUNCMD easyrsa sign-req server $1
       echo "Public key: $EASYRSA_PKI/issued/$1.crt"
       echo "Private key: $EASYRSA_PKI/private/$1.key"
@@ -259,7 +299,6 @@ function subject_renew() {
       ;;
     *)
       echo 'Invalid subject type'
-      echo 'Available types: client, server'
       ;;
   esac
 }
@@ -269,6 +308,11 @@ function subject_renew() {
 # @param $1 common name
 #
 function subject_revoke() {
+  if [ $# -le 1 ]; then
+    echo 'Invalid common name'
+    exit 1
+  fi
+
   # Revoke certifcate
   $RUNCMD easyrsa revoke $1
 
@@ -339,9 +383,6 @@ case "$command" in
     ;;
   set)
     exec subject_set ${@:2}
-    ;;
-  unrevoke)
-    # TODO
     ;;
   *)
     ;;

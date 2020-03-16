@@ -4,6 +4,7 @@
 #
 
 set -e
+source $CONTAINER_VARS_FILE
 
 # Lowercase command
 command="$(echo $1 | tr '[:upper:]' '[:lower:]')"
@@ -19,6 +20,10 @@ function generate_ca() {
 
 # Generate CRL
 function generate_crl() {
+  if [ ! -d "$EASYRSA_PKI" ]; then
+    exit 0
+  fi
+
   $RUNCMD easyrsa gen-crl
   $RUNCMD cp $EASYRSA_PKI/crl.pem $OPENVPN_DIR # Relect to OpenVPN
 }
@@ -118,25 +123,25 @@ function pki_init() {
 # Reflect PKI files into OpenVPN directory
 #
 function pki_reflect() {
+  if [ ! -d "$EASYRSA_PKI" ]; then
+    exit 0
+  fi
+
   $RUNCMD cp $EASYRSA_PKI/{ca.crt,crl.pem,dh.pem,ta.key} $OPENVPN_DIR
 }
 
-#
-#
-#
-
 case "$command" in
   crl)
-    exec generate_crl
+    generate_crl
     ;;
   del|rm)
-    exec pki_delete ${@:2}
+    pki_delete ${@:2}
     ;;
   init)
-    exec pki_init ${@:2}
+    pki_init ${@:2}
     ;;
   reflect)
-    exec pki_reflect ${@:2}
+    pki_reflect ${@:2}
     ;;
   run)
     $RUNCMD easyrsa ${@:2}

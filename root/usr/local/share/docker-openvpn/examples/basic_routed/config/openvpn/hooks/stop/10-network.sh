@@ -1,7 +1,5 @@
 #!/usr/bin/with-contenv bash
 
-source /app/hookBaseFirewallDestroy.sh
-
 #
 #   Network clear
 #

@@ -72,7 +72,8 @@ RUN apk add --no-cache \
       /sbin/route" \
       >> /etc/sudoers.d/${CONTAINER_USER} && \
     # Default configuration
-    cp $EASYRSA/vars.example /config/vars
+    cp $EASYRSA/vars.example /defaults/vars && \
+    cp $EASYRSA/openssl-easyrsa.cnf /defaults
 
 # Add repo files to image
 COPY root/ /

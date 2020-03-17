@@ -11,6 +11,7 @@ function usage() {
   echo 'Commands:'
   echo '  backup [file] # Backup config (Default location: /config/backup)'
   echo '  example [EXAMLE] # List examples or load example if name specified'
+  echo '  load FILE # Load configuration (.conf, .ovpn, .pkg.tar.gz)'
   echo '  pki crl # Updates CRL'
   echo '      init [nopass] # Inits PKI with CA (env MODULUS=... for dh.pem modulus)'
   echo '      reflect # Sync OpenVPN with PKI'

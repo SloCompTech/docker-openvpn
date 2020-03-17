@@ -20,13 +20,13 @@ fi
 # @param $2 file (optional)
 #
 function generate_ovpn() {
-  if [ $# -le 1 ]; then
+  if [ $# -lt 1 ]; then
     echo 'Invalid common name'
     exit 1
   fi
 
   # .ovpn protection
-  OVPN_FILE=${$2:="/config/client-configs/$1.ovpn"}
+  OVPN_FILE=${2:-"/config/client-configs/$1.ovpn"}
   if [ -f "$OVPN_FILE" ]; then
     read -r -p ".ovpn already exists for $1, are you sure you want to overwrite it? [y/N] " response
     if [[ ! "$response" =~ ^[Yy] ]]; then
@@ -53,7 +53,7 @@ function generate_ovpn() {
   $RUNCMD echo '</cert>' >> $OVPN_FILE
 
   # Add client's private key
-  if [ -f "EASYRSA_PKI/private/$1.key" ]; then
+  if [ -f "$EASYRSA_PKI/private/$1.key" ]; then
     $RUNCMD echo '<key>' >> $OVPN_FILE
     $RUNCMD cat $EASYRSA_PKI/private/$1.key >> $OVPN_FILE
     $RUNCMD echo '</key>' >> $OVPN_FILE
@@ -62,7 +62,7 @@ function generate_ovpn() {
   fi
 
   # Add TLS key if specified in client template config
-  srv_file=$(ovpn-confpath)
+  srv_file="$OPENVPN_DIR/$(ovpn-confpath)"
   crypto=`cat $srv_file | grep -E "^\\s*(secret|tls-auth|tls-crypt).*$" | cut -d" " -f1`
   if [ -n "$crypto" ]; then
     read -r -p "Add --$crypto to .ovpn? [Y/n] " response
@@ -94,7 +94,7 @@ function generate_ovpn() {
 # @param $2 file (optional)
 #
 function generate_pkg() {
-  if [ $# -le 1 ]; then
+  if [ $# -lt 1 ]; then
     echo 'Invalid common name'
     exit 1
   fi
@@ -178,12 +178,12 @@ function generate_pkg() {
 # @param $3+ easy-rsa gen-req args
 #
 function subject_add() {
-  if [ $# -le 2 ]; then
+  if [ $# -lt 2 ]; then
     echo 'Invalid arguments: COMMONNAME TYPE [EASYRSA_ARGS]'
     echo 'Available types: client, server'
     exit 1
   fi
-
+  echo "${@:3}"
   case "$2" in
     client)
       # Check if certificate already exist
@@ -217,7 +217,7 @@ function subject_add() {
       if [ -f "$EASYRSA_PKI/reqs/$1.req" ]; then
         echo 'Signing request already exists, using existing'
       else
-        $RUNCMD easyrsa build-server-full ${@:3}
+        $RUNCMD easyrsa build-server-full $1 ${@:3}
       fi
       $RUNCMD easyrsa sign-req server $1
       echo "Public key: $EASYRSA_PKI/issued/$1.crt"
@@ -241,7 +241,7 @@ function subject_add() {
 # @param $1 .req file path
 #
 function subject_importreq() {
-  if [ $# -le 1 ]; then
+  if [ $# -lt 1 ]; then
     echo 'Invalid file'
     exit 1
   fi
@@ -255,7 +255,7 @@ function subject_importreq() {
 # @param $3+ easy-rsa gen-req args
 #
 function subject_renew() {
-  if [ $# -le 2 ]; then
+  if [ $# -lt 2 ]; then
     echo 'Invalid arguments: COMMONNAME TYPE [EASYRSA_ARGS]'
     echo 'Available types: client, server'
     exit 1
@@ -308,7 +308,7 @@ function subject_renew() {
 # @param $1 common name
 #
 function subject_revoke() {
-  if [ $# -le 1 ]; then
+  if [ $# -lt 1 ]; then
     echo 'Invalid common name'
     exit 1
   fi
@@ -329,7 +329,7 @@ function subject_revoke() {
 # @param $3+ other args
 #
 function subject_set() {
-  if [ $# -le 3 ]; then
+  if [ $# -lt 3 ]; then
     echo 'Usage: set COMMONNAME OPTION [ARGS]'
     exit 1
   fi
@@ -353,6 +353,7 @@ function subject_set() {
       else
         echo "ifconfig-push $3 $MASK" >> $CLIENT_FILE
       fi
+      ;;
     *)
       echo 'Invalid option'
       exit 1
@@ -364,25 +365,25 @@ function subject_set() {
 
 case "$command" in
   add)
-    exec subject_add ${@:2}
+    subject_add ${@:2}
     ;;
   gen-ovpn)
-    exec generate_ovpn ${@:2}
+    generate_ovpn ${@:2}
     ;;
   gen-pkg)
-    exec generate_pkg ${@:2}
+    generate_pkg ${@:2}
     ;;
   import-req)
-    exec subject_importreq ${@:2}
+    subject_importreq ${@:2}
     ;;
   renew)
-    exec subject_renew ${@:2}
+    subject_renew ${@:2}
     ;;
   revoke)
-    exec subject_revoke ${@:2}
+    subject_revoke ${@:2}
     ;;
   set)
-    exec subject_set ${@:2}
+    subject_set ${@:2}
     ;;
   *)
     ;;

@@ -109,7 +109,7 @@ In this instance `PUID=1000` and `PGID=1000`, to find yours use `id user` as bel
   dev tun0 # You MUST set interface with name (with number !!)
   config include.conf # Includes general config
   config include-server.conf # Includes additional server config (only for server)
-  conf unprivileged.conf # Sets OpenVPN to run unprivileged
+  config unprivileged.conf # Sets OpenVPN to run unprivileged
   ```
 
 ### Server

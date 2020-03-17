@@ -15,6 +15,6 @@ fi
 
 run-parts --exit-on-error $OPENVPN_DIR/hooks/start
 
-exec s6-setuidgid $CONTAINER_USER openvpn --cd $OPENVPN_DIR --chroot $OPENVPN_DIR --config $config
+openvpn --cd $OPENVPN_DIR --config $config
 
 run-parts --exit-on-error $OPENVPN_DIR/hooks/stop

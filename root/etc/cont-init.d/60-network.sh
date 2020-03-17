@@ -32,6 +32,12 @@ if [ -z "$device" ]; then
 	exit 1
 fi
 
+# Delete tunnel interface (if not persistant), so no permission errors occur
+if [ -n "$(cat /proc/net/dev | grep $device)" ] && [ ! -f "/config/persistent-interface" ]; then
+  echo "Removing $device interface"
+	openvpn --rmtun --dev $device
+fi
+
 # Create tunnel interface
 if [ -z "$(cat /proc/net/dev | grep $device)" ]; then
 	echo "Creating $device interface"

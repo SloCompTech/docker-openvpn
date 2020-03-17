@@ -2,7 +2,8 @@
 # Base image
 # @see https://github.com/SloCompTech/docker-baseimage
 #
-FROM slocomptech/bi-python:3.8.0
+ARG FROM_SUFFIX
+FROM slocomptech/bi-python:3.8.0${FROM_SUFFIX}
 
 # Build arguments
 ARG BUILD_DATE

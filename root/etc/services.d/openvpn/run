@@ -10,7 +10,11 @@ fi
 config=$(ovpn-confpath)
 if [ -z "$config" ]; then
   read -p 'No configuration available'
-  exit 1
+  exit 0
 fi
 
+run-parts --exit-on-error $OPENVPN_DIR/hooks/start
+
 exec s6-setuidgid $CONTAINER_USER openvpn --cd $OPENVPN_DIR --chroot $OPENVPN_DIR --config $config
+
+run-parts --exit-on-error $OPENVPN_DIR/hooks/stop

@@ -129,7 +129,7 @@ If you are new to containers please see rather [Detailed first setup guide](docs
   ovpn pki init [nopass] # Inits PKI
   ```
 
-4. Setup OpenVPN config based on example `basic_nat` with configuration wizard or put your confi in `/config/openvpn/openvpn.conf`:  
+4. Setup OpenVPN config based on example `basic_nat` with configuration wizard or put your config in `/config/openvpn/openvpn.conf`:  
 
   ``` bash
   ovpn example basic_nat
@@ -142,16 +142,17 @@ If you are new to containers please see rather [Detailed first setup guide](docs
   #DNS2 [8.8.4.4]:
   ```
 
-5. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
-6. Add clients
+5. Generate server certificate `ovpn subject add server server [nopass]`.
+6. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
+7. Add clients
 
   ``` bash
-  # Generates client certificates
+  # Generates client certificates (put in client-confs directory)
   ovpn subject add <name> [nopass]
   ```
 
-7. Exit container with `exit`, then it will destroy itself.
-8. Start container using command specified in *Usage* section.
+8. Exit container with `exit`, then it will destroy itself.
+9. Start container using command specified in *Usage* section.
 
 For more infromation see:
 

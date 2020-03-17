@@ -6,10 +6,9 @@ Feel free to contribute to this project.
 
 Sections:
 
-- [Example configs & hooks](root/defaults/example/README.md)
+- [Example configs & hooks](root/usr/local/share/docker-openvpn/README.md)
 - [Guides](docs/README.md)
 - [Helper Scripts](root/app/README.md)  
-- [Modules](root/defaults/module/README.md)
 
 ## Syntax
 

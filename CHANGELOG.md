@@ -1,5 +1,10 @@
 # Changelog
 
+### 3.0.0 - New major release
+
+- Changed fs structure
+- Rewritten helper scripts
+
 ### 2.0.6 - Fixed bugs, added additonal parameters
 
 - Fixed bug in `ovpn` util.

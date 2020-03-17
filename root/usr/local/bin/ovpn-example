@@ -1,0 +1,35 @@
+#!/usr/bin/with-contenv bash
+#
+# Example utility script
+#
+
+set -e
+source $CONTAINER_VARS_FILE
+
+example_dir="/usr/local/share/docker-openvpn/examples/$1"
+
+if [ -z "$1" ] || [ ! -d "$example_dir" ]; then
+  ls -1 /usr/local/share/docker-openvpn/examples
+  exit 0
+else
+  if [ -f "$example_dir/wizard" ] && [ -x "$example_dir/wizard" ]; then
+    $RUNCMD mkdir -p /config/tmp/wizard
+    $RUNCMD cp -r /usr/local/share/docker-openvpn/examples/$1/* /config/tmp/wizard
+    cd /config/tmp/wizard
+    $RUNCMD ./wizard "/config/tmp/wizard" ${@:2}
+    exit_code=$?
+    # If wizard exists with code other than 0, return error
+    if [ $exit_code -ne 0 ]; then
+      echo "Error while executing wizard"
+      exit $exit_code
+    fi
+    $RUNCMD cp -r /config/tmp/wizard/config/* /config
+    $RUNCMD rm -r /config/tmp/wizard
+  else
+    $RUNCMD cp -r /usr/local/share/docker-openvpn/examples/$1/config/* /config
+
+    echo 'Sorry, wizard not available for this config'
+    echo ''
+    echo 'Please edit config files in /config to suite your needs'
+  fi
+fi

@@ -10,6 +10,7 @@ function usage() {
   echo ''
   echo 'Commands:'
   echo '  backup [file] # Backup config (Default location: /config/backup)'
+  echo '  example [EXAMLE] # List examples or load example if name specified'
   echo '  pki crl # Updates CRL'
   echo '      init [nopass] # Inits PKI with CA (env MODULUS=... for dh.pem modulus)'
   echo '      reflect # Sync OpenVPN with PKI'
@@ -31,6 +32,9 @@ command="$(echo $1 | tr '[:upper:]' '[:lower:]')"
 case "$command" in
   backup)
     exec ovpn-backup ${@:2}
+    ;;
+  example)
+    exec ovpn-example ${@:2}
     ;;
   pki)
     exec ovpn-pki ${@:2}

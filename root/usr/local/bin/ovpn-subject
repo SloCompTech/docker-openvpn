@@ -333,7 +333,7 @@ function subject_set() {
     echo 'Usage: set COMMONNAME OPTION [ARGS]'
     exit 1
   fi
-  CONF_FILE="$(ovpn-confpath)"
+  CONF_FILE="$OPENVPN_DIR/$(ovpn-confpath)"
   if [ -z "$CONF_FILE" ]; then
     echo 'No server configuration'
     exit 1
@@ -348,10 +348,10 @@ function subject_set() {
         exit 4
       fi
 
-      if [ -f "$CLIENT_FILE"] && [ -n "$(grep ifconfig-push $OPENVPN_DIR/ccd/$1)" ]; then
-        sed -i "/ifconfig-push\s*/s/[0-9\.:]+\s*[0-9\.:]+/$3 $MASK/" $CLIENT_FILE
+      if [ -f "$CLIENT_FILE" ] && [ -n "$(grep ifconfig-push $OPENVPN_DIR/ccd/$1)" ]; then
+        $RUNCMD sed -i "/ifconfig-push\s*/s/[0-9\.:]+\s*[0-9\.:]+/$3 $MASK/" $CLIENT_FILE
       else
-        echo "ifconfig-push $3 $MASK" >> $CLIENT_FILE
+        $RUNCMD echo "ifconfig-push $3 $MASK" >> $CLIENT_FILE
       fi
       ;;
     *)

@@ -77,7 +77,6 @@ services:
 |**Parameter**|**Function**|
 |:-----------:|:----------:|
 |`-e FAIL_MODE=hard`|Restart whole container on error|
-
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-e SKIP_APP=true`|Skip app startup|
@@ -85,6 +84,7 @@ services:
 |`-v /log`|Directory for log files (if configured)|
 
 See also: [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)  
+See [upstream image](https://github.com/SloCompTech/docker-baseimage)
 
 ## User / Group Identifiers
 
@@ -122,13 +122,14 @@ If you are new to containers please see rather [Detailed first setup guide](docs
   docker run -it --rm --cap-add NET_ADMIN -v </path/to/config>:/config slocomptech/openvpn:latest bash
   ```
 
-2. At this point you will have bash shell which runs in container. Now run following commands to setup your PKI:
+2. Edit `vars` file. (See [docs](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md))
+3. At this point you will have bash shell which runs in container. Now run following commands to setup your PKI:
 
   ``` bash
   ovpn pki init [nopass] # Inits PKI
   ```
 
-3. Setup OpenVPN config based on example `basic_nat` with configuration wizard or put your confi in `/config/openvpn/openvpn.conf`:  
+4. Setup OpenVPN config based on example `basic_nat` with configuration wizard or put your confi in `/config/openvpn/openvpn.conf`:  
 
   ``` bash
   ovpn example basic_nat
@@ -141,16 +142,16 @@ If you are new to containers please see rather [Detailed first setup guide](docs
   #DNS2 [8.8.4.4]:
   ```
 
-4. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
-5. Add clients
+5. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
+6. Add clients
 
   ``` bash
   # Generates client certificates
   ovpn subject add <name> [nopass]
   ```
 
-5. Exit container with `exit`, then it will destroy itself.
-6. Start container using command specified in *Usage* section.
+7. Exit container with `exit`, then it will destroy itself.
+8. Start container using command specified in *Usage* section.
 
 For more infromation see:
 
@@ -165,8 +166,7 @@ For more infromation see:
 2. Make sure you **don't** have following options specified in your config file
     - user
     - group
-    - anything that is already specified in *system.conf*
-3. Put config file in `/coonfig/openvpn`.
+3. Put config file in `/config/openvpn`.
 
 ## Troubleshooting
 

@@ -31,6 +31,7 @@ LABEL org.opencontainers.image.title="OpenVPN Server" \
 #
 ENV BACKUP_DIR=/config/backup \
     EASYRSA=/usr/share/easy-rsa \
+    EASYRSA_EXT_DIR=/config/x509-types \
     EASYRSA_PKI=/config/pki \
     EASYRSA_SSL_CONF=/config/openssl-easyrsa.cnf \
     EASYRSA_SAFE_CONF=/config/safessl-easyrsa.cnf \
@@ -41,6 +42,7 @@ ENV BACKUP_DIR=/config/backup \
 RUN apk add --no-cache \
       # Core packages
       bash \
+      gettext \
       easy-rsa \
       iptables \
       ip6tables \
@@ -74,7 +76,8 @@ RUN apk add --no-cache \
       >> /etc/sudoers.d/${CONTAINER_USER} && \
     # Default configuration
     cp $EASYRSA/vars.example /defaults/vars && \
-    cp $EASYRSA/openssl-easyrsa.cnf /defaults
+    cp $EASYRSA/openssl-easyrsa.cnf /defaults && \
+    cp -r $EASYRSA/x509-types /defaults
 
 # Add repo files to image
 COPY root/ /

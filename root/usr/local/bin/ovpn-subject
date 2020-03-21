@@ -131,16 +131,16 @@ function generate_pkg() {
 
   # Add CA certificate
   $RUNCMD cp $EASYRSA_PKI/ca.crt $TMP_DIR/openvpn
-  $RUNCMD echo 'ca ca.crt' >> $TMP_CONFIG
+  [ -n "$(grep ^\s*ca $TMP_CONFIG)" ] || $RUNCMD echo 'ca ca.crt' >> $TMP_CONFIG
 
   # Add client's public key
   $RUNCMD cp $EASYRSA_PKI/issued/$1.crt $TMP_DIR/openvpn
-  $RUNCMD echo "cert $1.key" >> $TMP_CONFIG
+  [ -n "$(grep ^\s*cert $TMP_CONFIG)" ] || $RUNCMD echo "cert $1.crt" >> $TMP_CONFIG
 
   # Add client's private key
   if [ -f "$EASYRSA_PKI/private/$1.key" ]; then
     $RUNCMD cp $EASYRSA_PKI/private/$1.key $TMP_DIR/openvpn
-    $RUNCMD echo "key $1.key" >> $TMP_CONFIG
+    [ -n "$(grep ^\s*key $TMP_CONFIG)" ] || $RUNCMD echo "key $1.key" >> $TMP_CONFIG
   else
     $RUNCMD echo "#key $1.key" >> $TMP_CONFIG
     echo 'Client private key not added (sign only mode), please add it manualy via --key or <key>...</key>'
@@ -154,14 +154,14 @@ function generate_pkg() {
     if [[ ! "$response" =~ ^[Nn] ]]; then
       if [ "$crypto" == 'tls-crypt' ]; then
         $RUNCMD cp $EASYRSA_PKI/ta.key $TMP_DIR/openvpn
-        $RUNCMD echo 'tls-crypt ta.key' >> $TMP_CONFIG
+        [ -n "$(grep ^\s*tls-crypt $TMP_CONFIG)" ] || $RUNCMD echo 'tls-crypt ta.key' >> $TMP_CONFIG
       elif [ "$crypto" == 'tls-auth' ]; then
         $RUNCMD cp $EASYRSA_PKI/ta.key $TMP_DIR/openvpn
-        $RUNCMD echo '# Note: If this is server config replace 1 with 0' >> $TMP_CONFIG
-        $RUNCMD echo 'tls-auth 1 ta.key' >> $TMP_CONFIG
+        [ -n "$(grep ^\s*tls-auth $TMP_CONFIG)" ] || $RUNCMD echo '# Note: If this is server config replace 1 with 0' >> $TMP_CONFIG
+        [ -n "$(grep ^\s*tls-auth $TMP_CONFIG)" ] || $RUNCMD echo 'tls-auth 1 ta.key' >> $TMP_CONFIG
       elif [ "$crypto" == "secret" ]; then
         $RUNCMD cat $EASYRSA_PKI/secret.key $TMP_DIR/openvpn
-        $RUNCMD echo 'secret secret.key' >> $TMP_CONFIG
+        [ -n "$(grep ^\s*secret $TMP_CONFIG)" ] || $RUNCMD echo 'secret secret.key' >> $TMP_CONFIG
       fi
     fi  
   fi

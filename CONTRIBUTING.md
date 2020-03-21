@@ -45,7 +45,7 @@ Sections:
       tls-verify # Check certificate
     include.conf # Container specific settings (must be included)
     openvpn.conf or *.ovpn file # Main configuration file
-    openvpn-client.conf # Client base configuration file, base for creating .ovpn files
+    openvpn-template.conf # Template configuration for creating .ovpn and .pkg
     pid # OpenVPN PID (automatically written)
     server.crt (*) # Server public key
     server.key (*) # Server private key

@@ -87,7 +87,7 @@ vars = [
 # Process config files
 confs = [
   "/config/openvpn/openvpn.conf",
-  "/config/openvpn/openvpn-client.conf",
+  "/config/openvpn/openvpn-template.conf",
   "/config/openvpn/hooks/down/10-network.sh",
   "/config/openvpn/hooks/up/10-network.sh"
 ]

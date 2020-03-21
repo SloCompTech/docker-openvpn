@@ -4,6 +4,7 @@
 
 - Changed fs structure
 - Rewritten helper scripts
+- Reorganized examples
 
 ### 2.0.6 - Fixed bugs, added additonal parameters
 

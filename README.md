@@ -193,3 +193,10 @@ Feel free to contribute new features to this container, but first see [Contribut
 ## Versions
 
 See [CHANGELOG](CHANGELOG.md)
+
+## External documentation
+
+- [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Readme.md)
+- [EasyRSA vars](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)
+- [OpenVPN](https://community.openvpn.net/openvpn/wiki/Openvpn24ManPage)
+- [s6](https://skarnet.org/software/s6)

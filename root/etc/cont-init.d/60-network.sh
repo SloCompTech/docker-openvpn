@@ -7,6 +7,7 @@
 #	@see https://community.openvpn.net/openvpn/wiki/UnprivilegedUser
 #	@see https://community.openvpn.net/openvpn/wiki/HOWTO#UnprivilegedmodeLinuxonly
 #	@see https://unix.stackexchange.com/questions/18215/which-user-group-can-use-the-tap-net-device
+#	@see https://github.com/kylemanna/docker-openvpn/issues/39
 #
 
 if [ -n "$SKIP_APP" ]; then

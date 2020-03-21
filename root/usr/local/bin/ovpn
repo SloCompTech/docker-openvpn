@@ -37,6 +37,9 @@ case "$command" in
   example)
     exec ovpn-example ${@:2}
     ;;
+  load)
+    exec ovpn-load ${@:2}
+    ;;
   pki)
     exec ovpn-pki ${@:2}
     ;;

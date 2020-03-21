@@ -15,7 +15,7 @@ file="$(basename $1)"
 ext="${file#*.}"
 
 if [ "$ext" == "pkg.tar.gz" ]; then
-  $RUNCMD tar -xvzf $1 -C $OPENVPN_DIR
+  $RUNCMD tar -xvzf $1 -C /config
 elif [ "$ext" == "ovpn" ]; then
   $RUNCMD cp $1 $OPENVPN_DIR/$file
 elif [ "$ext" == "conf" ]; then

@@ -76,6 +76,7 @@ services:
 
 |**Parameter**|**Function**|
 |:-----------:|:----------:|
+|`-e CONFIG=test.conf`|Config file name|
 |`-e FAIL_MODE=hard`|Restart whole container on error|
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|

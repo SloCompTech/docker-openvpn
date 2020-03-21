@@ -10,7 +10,7 @@ fi
 
 config="$(ovpn-confpath)"
 
-device="$(cat $OPENVPN_DIR/$config | sed -n -re 's/^\s*dev\s*(\w+)\s*$/\1/p')"
+device="$(ovpn-dev)"
 if [ -z "$device" ]; then
 	echo 'Interface not set'
 	exit 1

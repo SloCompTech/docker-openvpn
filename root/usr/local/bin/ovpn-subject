@@ -37,7 +37,7 @@ function generate_ovpn() {
 
   # Start with client config template if it exist
   if [ -f "$OPENVPN_DIR/openvpn-template.conf" ]; then
-    $RUNCMD cat $OPENVPN_DIR/openvpn-template.conf > $OVPN_FILE
+    $RUNCMD bash -c "cat $OPENVPN_DIR/openvpn-template.conf > $OVPN_FILE"
   else
     $RUNCMD touch $OVPN_FILE
   fi
@@ -103,14 +103,14 @@ function generate_pkg() {
   TMP_DIR=/config/tmp/pkg
   TMP_CONFIG=$TMP_DIR/openvpn/openvpn.conf
   if [ -d "$TMP_DIR" ]; then
-    rm -r $TMP_DIR/*
+    $RUNCMD rm -r $TMP_DIR
   else
-    mkdir -p $TMP_DIR
+    $RUNCMD mkdir -p $TMP_DIR
   fi
   
 
   # pkg file protection
-  PKG_FILE=${$2:="/config/client-configs/$1.pkg.tar.gz"}
+  PKG_FILE=${2:-"/config/client-configs/$1.pkg.tar.gz"}
   if [ -f "$PKG_FILE" ]; then
     read -r -p "pkg already exists for $1, are you sure you want to overwrite it? [y/N] " response
     if [[ ! "$response" =~ ^[Yy] ]]; then
@@ -119,11 +119,11 @@ function generate_pkg() {
     $RUNCMD rm $PKG_FILE
   fi
 
-  mkdir -p $TMP_DIR/openvpn
+  $RUNCMD mkdir -p $TMP_DIR/openvpn
 
   # Start with client config template if it exist
   if [ -f "$OPENVPN_DIR/openvpn-template.conf" ]; then
-    $RUNCMD cat $OPENVPN_DIR/openvpn-template.conf > $TMP_CONFIG
+    $RUNCMD bash -c "cat $OPENVPN_DIR/openvpn-template.conf > $TMP_CONFIG"
   else
     $RUNCMD touch $TMP_CONFIG
   fi
@@ -138,7 +138,7 @@ function generate_pkg() {
   $RUNCMD echo "cert $1.key" >> $TMP_CONFIG
 
   # Add client's private key
-  if [ -f "EASYRSA_PKI/private/$1.key" ]; then
+  if [ -f "$EASYRSA_PKI/private/$1.key" ]; then
     $RUNCMD cp $EASYRSA_PKI/private/$1.key $TMP_DIR/openvpn
     $RUNCMD echo "key $1.key" >> $TMP_CONFIG
   else
@@ -166,8 +166,8 @@ function generate_pkg() {
     fi  
   fi
 
-  $RUNCMD tar -C $TMP_DIR -cvzf $PKG_FILE .
-  rm -r $TMP_DIR
+  $RUNCMD tar -C $TMP_DIR -cvzf $PKG_FILE $(ls $TMP_DIR)
+  $RUNCMD rm -r $TMP_DIR
   echo "Generated $PKG_FILE"
 }
 

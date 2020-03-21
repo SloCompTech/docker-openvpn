@@ -13,5 +13,5 @@ else
   FILE=$BACKUP_DIR/openvpn_$(date +%Y%m%d%H%M%S).bck.tar.gz
 fi
 
-$RUNCMD tar -C /config --exclude=backup -cvzf $FILE .
+$RUNCMD tar -C /config --exclude=backup -cvzf $FILE $(ls /config)
 echo "Configuration backed up in $FILE"

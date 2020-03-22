@@ -1,82 +1,47 @@
-#!/usr/local/bin/python
-
+#!/usr/bin/with-contenv bash
 #
-#   Config wizard for basic_nat example
-#   @author Martin Dagarin
-#   @version 1
-#   @since 19/03/2019
-#
-
-#   Defaults:
-#       Protocol: udp
-#       Network: 10.0.0.0
-#       Port: 1194
-#       DNS: 8.8.8.8, 8.8.4.4
+# Config wizard for basic example
+# @author Martin Dagarin
+# @version 2
+# @since 22/03/2020
 #
 
-import sys, os
+if [ -z "$1" ]; then
+  echo 'Directory path missing'
+  exit 1
+fi
 
-# Import libraries included in this docker
-sys.path.insert(0, '/app')
-import libovpn
+read -p 'Protocol udp, tcp, udp6, tcp6 [udp]: ' protocol
+protocol=${protocol:=udp}
 
-# Check if temporary path was passed to this script
-if len(sys.argv) < 2:
-    print("Temporary path was not passed to wizard")
-    sys.exit(1)
-TEMP_PATH = sys.argv[1]
-if not os.path.isdir(TEMP_PATH):
-    print("Specified directory does not exist")
-    sys.exit(2)
+read -p 'Port [1194]: ' port
+port=${port:=1194}
 
-# Select protocol
-protocol = input("Protocol udp, tcp, udp6, tcp6 [udp]:")
-AVAILABLE_PROTOCOLS = ["udp", "tcp", "udp6", "tcp6"]
-if len(protocol) != 0 and protocol not in AVAILABLE_PROTOCOLS:
-    print("Invalid protocol")
-    sys.exit(3)
-if len(protocol) == 0:
-    protocol = "udp"
+read -p 'Public IP: ' public_ip
+if [ -z "$public_ip" ]; then echo 'Invalid IP'; exit 2; fi
 
-# Select network
-network = input("VPN network [10.0.0.0]:")
-if len(network) == 0:
-  network = "10.0.0.0"
+read -p 'VPN network [10.8.0.0]: ' network
+network=${network:='10.8.0.0'}
 
-# Select port
-port = input("Port [1194]:")
-if len(port) == 0:
-  port="1194"
+read -p 'DNS1 [1.1.1.1]: ' dns1
+dns1=${dns1:='1.1.1.1'}
 
-# Select Public IP or domain
-public = input("Public IP or domain of server:")
-if len(public) == 0:
-  print("Invalid Public IP")
-  sys.exit(4)
+read -p 'DNS2 [8.8.8.8]: ' dns2
+dns2=${dns2:='8.8.8.8'}
 
-# DNS servers
-dns1 = input("DNS1 [8.8.8.8]:")
-if len(dns1) == 0:
-  dns1 = "8.8.8.8"
-dns2 = input("DNS2 [8.8.4.4]:")
-if len(dns2) == 0:
-  dns2 = "8.8.4.4"
+confs=(
+  "$1/config/openvpn/openvpn.conf"
+  "$1/config/openvpn/openvpn-template.conf"
+)
 
-
-# Write to server config
-vars = [
-  ("$PROTO", protocol),
-  ("$PORT", port),
-  ("$NETWORK_ADDRESS", network),
-  ("$SERVER_IP", public),
-  ("$DNS1", dns1),
-  ("$DNS2", dns2)
-]
-
-# Process config files
-confs = [
-  "/config/openvpn/openvpn.conf",
-  "/config/openvpn/openvpn-template.conf"
-]
-for config_file in confs:
-  libovpn.conf_envsubst(TEMP_PATH + config_file, vars)
+for file in "${confs[@]}"
+do
+  mv $file $file.old
+  PROTO="$protocol" \
+  PORT="$port" \
+  SERVER_IP="$public_ip" \
+  NETWORK_ADDRESS="$network" \
+  DNS1="$dns1" \
+  DNS2="$dns2" \
+  envsubst < $file.old > $file
+done

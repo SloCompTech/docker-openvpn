@@ -164,6 +164,8 @@ For more infromation see:
 - **configuration example directory** (for more info about example)  
 - [Contributing](CONTRIBUTING.md) (for explanation how container works, how to write an example config ...)  
 
+**Note:** OpenVPN documentation is located at `/usr/share/doc/openvpn`.
+
 ### Client
 
 1. Run container to get config structure `docker run -it --rm -v PATH:/config slocomptech/openvpn`.

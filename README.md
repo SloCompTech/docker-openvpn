@@ -95,9 +95,9 @@ Ensure any volume directories on the host are owned by the same user you specify
 
 In this instance `PUID=1000` and `PGID=1000`, to find yours use `id user` as below:
 
-```
-  $ id username
-    uid=1000(dockeruser) gid=1000(dockergroup) groups=1000(dockergroup)
+``` bash
+id username
+# uid=1000(dockeruser) gid=1000(dockergroup) groups=1000(dockergroup)
 ```
 
 ## Configuration
@@ -118,9 +118,9 @@ In this instance `PUID=1000` and `PGID=1000`, to find yours use `id user` as bel
 If you are new to containers please see rather [Detailed first setup guide](docs/SetupGuide.md), because it includes more detailed description.
 
 1. Init configuration directory with initial config files:
-    
+  
   ``` bash
-  docker run -it --rm --cap-add NET_ADMIN -v </path/to/config>:/config slocomptech/openvpn:latest bash
+  docker run -it --rm --cap-add NET_ADMIN -e SKIP_APP=true -v </path/to/config>:/config slocomptech/openvpn:latest bash
   ```
 
 2. Edit `vars` file. (See [docs](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md))
@@ -130,10 +130,10 @@ If you are new to containers please see rather [Detailed first setup guide](docs
   ovpn pki init [nopass] # Inits PKI
   ```
 
-4. Setup OpenVPN config based on example `basic_nat` with configuration wizard or put your config in `/config/openvpn/openvpn.conf`:  
+4. Setup OpenVPN config based on example `basic` with configuration wizard or put your config in `/config/openvpn/openvpn.conf`:  
 
   ``` bash
-  ovpn example basic_nat
+  ovpn example basic
   #Out interface [eth0]: <interface connected to the Internet>
   #Protocol udp, tcp, udp6, tcp6 [udp]:
   #VPN network [10.0.0.0]:
@@ -150,6 +150,8 @@ If you are new to containers please see rather [Detailed first setup guide](docs
   ``` bash
   # Generates client certificates (put in client-confs directory)
   ovpn subject add <name> [nopass]
+  # Generate .ovpn manually (generated in client-configs)
+  ovpn subject gen-ovpn <name>
   ```
 
 8. Exit container with `exit`, then it will destroy itself.
@@ -200,4 +202,6 @@ See [CHANGELOG](CHANGELOG.md)
 - [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Readme.md)
 - [EasyRSA vars](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)
 - [OpenVPN](https://community.openvpn.net/openvpn/wiki/Openvpn24ManPage)
+- [OpenVPN getting started](https://community.openvpn.net/openvpn/wiki/GettingStartedwithOVPN)
+- [OpenVPN how to](https://openvpn.net/community-resources/how-to/)
 - [s6](https://skarnet.org/software/s6)

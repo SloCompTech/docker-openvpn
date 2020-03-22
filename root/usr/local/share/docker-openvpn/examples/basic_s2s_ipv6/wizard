@@ -1,0 +1,55 @@
+#!/usr/bin/with-contenv bash
+#
+# Config wizard for basic_s2s example
+# @author Martin Dagarin
+# @version 1
+# @since 20/03/2020
+#
+
+if [ -z "$1" ]; then
+  echo 'Directory path missing'
+  exit 1
+fi
+
+read -p 'Protocol udp, tcp, udp6, tcp6 [udp]: ' protocol
+protocol=${protocol:=udp}
+
+read -p 'Port [1194]: ' port
+port=${port:=1194}
+
+read -p 'Site A public IP: ' remote_a
+if [ -z "$remote_a" ]; then echo 'Invalid IP'; exit 2; fi
+
+read -p 'Site A tunnel IP: ' ip_a
+if [ -z "$ip_a" ]; then echo 'Invalid IP'; exit 2; fi
+
+read -p 'Site A tunnel IPv6: ' ip6_a
+if [ -z "$ip6_a" ]; then echo 'Invalid IPv6'; exit 2; fi
+
+read -p 'Site B public IP: ' remote_b
+if [ -z "$remote_b" ]; then echo 'Invalid IP'; exit 2; fi
+
+read -p 'Site B tunnel IP: ' ip_b
+if [ -z "$ip_b" ]; then echo 'Invalid IP'; exit 2; fi
+
+read -p 'Site B tunnel IPv6: ' ip6_b
+if [ -z "$ip6_b" ]; then echo 'Invalid IPv6'; exit 2; fi
+
+confs=(
+  "$1/config/openvpn/openvpn.conf"
+  "$1/config/openvpn/openvpn-template.conf"
+)
+
+for file in "${confs[@]}"
+do
+  mv $file $file.old
+  PROTO="$protocol" \
+  PORT="$port" \
+  REMOTE_A="$remote_a" \
+  IP_A="$ip_a" \
+  IP6_A="$ip6_a" \
+  REMOTE_B="$remote_b" \
+  IP_B="$ip_b" \
+  IP6_B="$ip6_b" \
+  envsubst < $file.old > $file
+done

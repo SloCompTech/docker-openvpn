@@ -12,7 +12,7 @@ Features:
 ovpn pki init [nopass]
 
 # Load example
-ovpn example basic_s2s
+ovpn example basic_s2s_ipv6
 
 # Certifcates
 # NOTE: To also use server certificates for p2p connection between servers

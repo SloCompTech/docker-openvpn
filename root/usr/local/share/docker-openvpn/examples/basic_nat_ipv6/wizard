@@ -12,28 +12,28 @@ if [ -z "$1" ]; then
 fi
 
 read -p 'Out interface [eth0]: ' outint
-outint=${outint:='eth0'}
+outint=${outint:-'eth0'}
 
 read -p 'Protocol udp, tcp, udp6, tcp6 [udp]: ' protocol
-protocol=${protocol:=udp}
+protocol=${protocol:-udp}
 
 read -p 'Port [1194]: ' port
-port=${port:=1194}
+port=${port:-1194}
 
 read -p 'Public IP: ' public_ip
 if [ -z "$public_ip" ]; then echo 'Invalid IP'; exit 2; fi
 
 read -p 'VPN network [10.8.0.0]: ' network
-network=${network:='10.8.0.0'}
+network=${network:-'10.8.0.0'}
 
 read -p 'VPN IPv6 network with CIDR [2001:db8::/64]: ' network6
-network6=${network6:='2001:db8::/64'}
+network6=${network6:-'2001:db8::/64'}
 
 read -p 'DNS1 [1.1.1.1]: ' dns1
-dns1=${dns1:='1.1.1.1'}
+dns1=${dns1:-'1.1.1.1'}
 
 read -p 'DNS2 [8.8.8.8]: ' dns2
-dns2=${dns2:='8.8.8.8'}
+dns2=${dns2:-'8.8.8.8'}
 
 confs=(
   "$1/config/openvpn/openvpn.conf"

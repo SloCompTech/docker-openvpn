@@ -1,0 +1,27 @@
+#!/usr/bin/with-contenv bash
+#
+# Restore utility
+#
+
+set -e
+
+source $CONTAINER_VARS_FILE
+
+if [ -n "$1" ]; then
+  FILE=$1
+else
+  FILE=$(find $BACKUP_DIR -name *.bck.tar.gz | sort --reverse | head -n 1)
+fi
+
+if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then
+  echo "File doesn't exist"
+  exit 2
+fi
+
+read -p "Are you sure, you want to restore from $(realpath $FILE)? [y/N]: " response 
+if [[ ! "$response" =~ ^[Yy] ]]; then
+  exit 0
+fi
+
+$RUNCMD tar -xvzf $FILE -C /config
+echo 'Configuration restored'

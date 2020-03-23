@@ -1,0 +1,149 @@
+##!/usr/bin/with-contenv bash
+#
+# PKI utility script
+#
+
+set -e
+source $CONTAINER_VARS_FILE
+
+# Lowercase command
+command="$(echo $1 | tr '[:upper:]' '[:lower:]')"
+
+# Generate CA certificate
+function generate_ca() {
+  echo 'Now it will build CA files for issuing new certifiactes'
+  echo 'Please protect ca.key with secure password (used for signing new certs)'
+  echo 'ca.key is needed only for signing new certificates, not for OpenVPN to work'
+  $RUNCMD easyrsa build-ca ${@:1}
+  $RUNCMD cp $EASYRSA_PKI/ca.crt $OPENVPN_DIR # Relect to OpenVPN
+}
+
+# Generate CRL
+function generate_crl() {
+  if [ ! -d "$EASYRSA_PKI" ]; then
+    exit 0
+  fi
+
+  $RUNCMD easyrsa gen-crl
+  $RUNCMD cp $EASYRSA_PKI/crl.pem $OPENVPN_DIR # Relect to OpenVPN
+}
+
+# Generate dh.pem
+function generate_dh() {
+  $RUNCMD easyrsa gen-dh ${@:1}
+  $RUNCMD cp $EASYRSA_PKI/dh.pem $OPENVPN_DIR # Relect to OpenVPN
+}
+
+# Generate ta.key
+function generate_ta() {
+  $RUNCMD openvpn --genkey --secret $EASYRSA_PKI/ta.key
+  $RUNCMD cp $EASYRSA_PKI/ta.key $OPENVPN_DIR # Relect to OpenVPN
+}
+
+#
+# Delete PKI
+#
+function pki_delete() {
+  # Check if PKI directory exists
+  if [ ! -d "$EASYRSA_PKI" ]; then
+    echo 'PKI does not exist'
+    exit 1
+  fi
+
+  # Confirm choice
+  read -r -p 'Removing PKI are you sure (backup?)? [y/N] ' response
+  if [[ ! "$response" =~ ^[Yy] ]]; then
+    exit 0
+  fi
+
+  rm -r $EASYRSA_PKI
+  echo 'PKI removed'
+}
+
+#
+# Init PKI
+#
+function pki_init() {
+  # Check if PKI directory exists
+  if [ -d "$EASYRSA_PKI" ]; then
+    read -r -p 'PKI already exist, reconfigure? [y/N] ' response
+    if [[ ! "$response" =~ ^[Yy] ]]; then
+      exit 0
+    fi
+  fi
+
+  # Check if user confiured vars file
+  read -r -p 'vars file configured? [Y/n] ' response
+  if [[ "$response" =~ ^[Nn] ]]; then
+    exit 0
+  fi
+
+  # Init PKI
+  if [ ! -d "$EASYRSA_PKI" ]; then
+    $RUNCMD easyrsa init-pki
+  fi
+
+  # Build CA
+  if [ -f "$EASYRSA_PKI/ca.crt" ]; then
+    read -r -p 'ca.crt exist. Rebuild CA? [y/N] ' response
+    echo
+    if [[ "$response" =~ ^[Yy] ]]; then
+      generate_ca ${@:1}
+    fi
+  else
+    generate_ca ${@:1}
+  fi
+
+  # dh.pem
+  if [ -f "$EASYRSA_PKI/dh.pem" ]; then
+    read -r -p 'dh.pem exist. Regenerate? [y/N] ' response
+    if [[ "$response" =~ ^[Yy] ]]; then
+      generate_dh $MODULUS
+    fi
+  else
+    generate_dh $MODULUS
+  fi
+
+  # Generate CRL
+  generate_crl
+
+  # Generate ta.key (for tls-auth,tls-crypt)
+  if [ -f "$EASYRSA_PKI/ta.key" ]; then
+    read -r -p 'ta.key exist. Regenerate? [y/N] ' response
+    echo
+    if [[ "$response" =~ ^[Yy] ]]; then
+      generate_ta
+    fi
+  else
+    generate_ta
+  fi
+}
+
+#
+# Reflect PKI files into OpenVPN directory
+#
+function pki_reflect() {
+  if [ ! -d "$EASYRSA_PKI" ]; then
+    exit 0
+  fi
+
+  $RUNCMD cp $EASYRSA_PKI/{ca.crt,crl.pem,dh.pem,ta.key} $OPENVPN_DIR
+}
+
+case "$command" in
+  crl)
+    generate_crl
+    ;;
+  del|rm)
+    pki_delete ${@:2}
+    ;;
+  init)
+    pki_init ${@:2}
+    ;;
+  reflect)
+    pki_reflect ${@:2}
+    ;;
+  run)
+    $RUNCMD easyrsa ${@:2}
+    ;;
+esac

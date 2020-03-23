@@ -8,10 +8,10 @@ This is simple setup guide to help you get started. It uses the simplest configu
 
   ``` bash
   # Starts temporary container, soo you will be able to generate intial config files and opens bash shell in container
-  docker run -it --rm --cap-add NET_ADMIN -v </path/to/config>:/config slocomptech/openvpn:latest bash
+  docker run -it --rm --cap-add NET_ADMIN -e SKIP_APP=true -v </path/to/config>:/config slocomptech/openvpn:latest bash
   ```
-
-2. At this point you will have bash shell which runs in container. Now run following commands to **setup your PKI**:  
+2. Edit `vars` file
+3. At this point you will have bash shell which runs in container. Now run following commands to **setup your PKI**:  
 
   ``` bash
   ovpn pki init [nopass] # Inits PKI
@@ -91,10 +91,10 @@ This is simple setup guide to help you get started. It uses the simplest configu
 
   **Note:** You can generate PKI without password, just use `nopass` option.  
 
-3. Setup OpenVPN config based on example `basic_nat` with configuration wizard:
+4. Setup OpenVPN config based on example `basic` with configuration wizard:
 
   ``` bash
-  ovpn enconf basic_nat
+  ovpn enconf basic
   #Out interface [eth0]: <interface connected to the Internet>
   #Protocol udp, tcp, udp6, tcp6 [udp]:
   #VPN network [10.0.0.0]:
@@ -105,27 +105,29 @@ This is simple setup guide to help you get started. It uses the simplest configu
   ```
 
   **Note:** If you are using this container for production use your Public IP (if you don't know it, check with `whatsmyip` website and make sure it is **static**, for testing purposes at home, you can use local IP).
+5. Generate server certificate
 
-4. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
-5. Add clients to your server
+  ``` bash
+  ovpn subject add server server [nopass] # First server is name
+  ```
+
+6. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
+7. Add clients to your server
 
   ``` bash
   # Generates client certificates
-  ovpn client add <name> [nopass]
+  ovpn subject add <name> client [nopass]
 
-  # Generates client config file and saves it to /config/tmp
-  ovpn client ovpn <name>
-
-  # OR BETTER SOLLUTION: Run outside container
-  docker exec -it <container name> ovpn client ovpnp <name> > <config file>.ovpn
+  # Manually generates client config file and saves it to /config/client-configs
+  ovpn subject gen-ovpn <name>
   ```
 
 **Note:** Client config files MUST be transported to your devices via **SECURE** method such as USB (email is considered **INSECURE**).
 
-5. Exit container with `exit`, then it will destroy itself.
-6. Now you can create config file outside container, mentioned above.
-7. If you need to access bash shell again (to add another client after server was started) just use `docker exec -it <container name> bash`.
-8. Start container using normal command:
+8. Exit container with `exit`, then it will destroy itself.
+9. Now you can create config file outside container, mentioned above.
+10. If you need to access bash shell again (to add another client after server was started) just use `docker exec -it <container name> bash`.
+11. Start container using normal command:
 
     ``` bash
     docker run \

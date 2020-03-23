@@ -1,41 +1,55 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
+#
+# Utility script
+#
 
-#
-#	  OpenVPN utils
-#
+set -e
 
 function usage() {
-  echo "Usage: ovpn COMMAND [ARGS..]"
-  echo ""
-  echo "Commands:"
-  echo "  backup                                            # Creates backup of configuration files"
-  echo "  client [add|ovpn|ovpnp|ban|revoke|remove|delete|help] [NAME] [nopass] # Client manipulation"
-  echo "  disconf                                           # Deletes active config"
-  echo "  enconf  EXAMPLE_CONFIG_NAME [wizard args]         # Enable example config"
-  echo "  pki [init|remove|delete]                          # Public Key Intrastructure"
-  echo "  restore ARCHIVE_FILE                              # Restores backup"
+  echo 'Usage: ovpn COMMAND [ARGS..]'
+  echo ''
+  echo 'Commands:'
+  echo '  backup [file] # Backup config (Default location: /config/backup)'
+  echo '  example [EXAMLE] # List examples or load example if name specified'
+  echo '  load FILE # Load configuration (.conf, .ovpn, .pkg.tar.gz)'
+  echo '  pki crl # Updates CRL'
+  echo '      init [nopass] # Inits PKI with CA (env MODULUS=... for dh.pem modulus)'
+  echo '      reflect # Sync OpenVPN with PKI'
+  echo '      rm|del  # Remove PKI'
+  echo '  restore [file] # Restore config'
+  echo '  subject add NAME {client|server} [nopass] [easy-rsa args]'
+  echo '          gen-ovpn SUBNAME [file] # Generate .ovpn file (TEMPLATE=<custom template in openvpn dir)'
+  echo '          gen-pkg SUBNAME [file] # Generate config package (TEMPLATE=<custom template in openvpn dir)'
+  echo '          import-req FILE # Import signing request'
+  echo '          renew SUBNAME {client|server} [easy-rsa args]'
+  echo '          revoke SUBNAME'
+  echo '          set SUBNAME OPTION [ARGS]'
+  echo '                      ip IP # Only works on server with configured server options'
 }
 
-if [ $# -lt 1 ] || [ "$1" == "help" ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
-  usage
-  exit 1
-fi
+# Lowercase command
+command="$(echo $1 | tr '[:upper:]' '[:lower:]')"
 
-# Run selected command
-cmd="$(echo $1 | tr '[:upper:]' '[:lower:]')" # Convert to lowercase
-if [ "$cmd" == "backup" ]; then
-  ovpn_backup ${@:2}
-elif [ "$cmd" == "client" ]; then
-  ovpn_client ${@:2}
-elif [ "$cmd" == "disconf" ]; then
-  ovpn_disconf ${@:2}
-elif [ "$cmd" == "enconf" ]; then
-  ovpn_enconf ${@:2}
-elif [ "$cmd" == "pki" ]; then
-  ovpn_pki ${@:2}
-elif [ "$cmd" == "restore" ]; then
-  ovpn_restore ${@:2}
-else
-  usage
-  exit 1
-fi
+case "$command" in
+  backup)
+    exec ovpn-backup ${@:2}
+    ;;
+  example)
+    exec ovpn-example ${@:2}
+    ;;
+  load)
+    exec ovpn-load ${@:2}
+    ;;
+  pki)
+    exec ovpn-pki ${@:2}
+    ;;
+  restore)
+    exec ovpn-restore ${@:2}
+    ;;
+  subject)
+    exec ovpn-subject ${@:2}
+    ;;
+  *)
+    usage
+    ;;
+esac

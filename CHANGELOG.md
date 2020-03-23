@@ -1,5 +1,15 @@
 # Changelog
 
+### 3.0.0 - New major release
+
+- Changed fs structure
+- Rewritten helper scripts
+- Reorganized examples
+- Added Site-to-site example
+- Removed `compression` from examples
+- Switched to bash wizards
+- Added auth-pass-verify example script
+
 ### 2.0.6 - Fixed bugs, added additonal parameters
 
 - Fixed bug in `ovpn` util.

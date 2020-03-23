@@ -1,0 +1,431 @@
+#!/usr/bin/with-contenv bash
+#
+# Subject utility script
+#
+
+set -e
+source $CONTAINER_VARS_FILE
+
+# Lowercase command
+command="$(echo $1 | tr '[:upper:]' '[:lower:]')"
+
+if [ $# -lt 2 ]; then
+  echo 'Invalid agruments, subject name missing'
+  exit 1
+fi
+
+#
+# Generate .ovpn file
+# @param $1 common name
+# @param $2 file (optional)
+#
+function generate_ovpn() {
+  if [ $# -lt 1 ]; then
+    echo 'Invalid common name'
+    exit 1
+  fi
+
+  # .ovpn protection
+  OVPN_FILE=${2:-"/config/client-configs/$1.ovpn"}
+  if [ -f "$OVPN_FILE" ]; then
+    read -r -p ".ovpn already exists for $1, are you sure you want to overwrite it? [y/N] " response
+    if [[ ! "$response" =~ ^[Yy] ]]; then
+      exit 0
+    fi
+    $RUNCMD rm $OVPN_FILE
+  fi
+
+  # Start with client config template if it exist
+  TEMPLATE=${TEMPLATE:='openvpn-template.conf'}
+  if [ -f "$OPENVPN_DIR/$TEMPLATE" ]; then
+    $RUNCMD bash -c "cat $OPENVPN_DIR/$TEMPLATE > $OVPN_FILE"
+  else
+    $RUNCMD touch $OVPN_FILE
+  fi
+
+  # Add CA certificate
+  if [ -f "$EASYRSA_PKI/ca.crt" ]; then
+    $RUNCMD echo '<ca>' >> $OVPN_FILE
+    $RUNCMD cat $EASYRSA_PKI/ca.crt >> $OVPN_FILE
+    $RUNCMD echo '</ca>' >> $OVPN_FILE
+  else
+    echo 'No ca.crt added, please add it manually via --ca or <ca>...</ca>'
+  fi
+
+  # Add client's public key
+  if [ -f "$EASYRSA_PKI/issued/$1.crt" ]; then
+    $RUNCMD echo '<cert>' >> $OVPN_FILE
+    $RUNCMD cat $EASYRSA_PKI/issued/$1.crt >> $OVPN_FILE
+    $RUNCMD echo '</cert>' >> $OVPN_FILE
+  else
+    echo 'No public key added, please add it manually via --cert or <cert>...</cert>'
+  fi
+
+  # Add client's private key
+  if [ -f "$EASYRSA_PKI/private/$1.key" ]; then
+    $RUNCMD echo '<key>' >> $OVPN_FILE
+    $RUNCMD cat $EASYRSA_PKI/private/$1.key >> $OVPN_FILE
+    $RUNCMD echo '</key>' >> $OVPN_FILE
+  else
+    echo 'Private key not added (sign only mode), please add it manually via --key or <key>...</key>'
+  fi
+
+  # Add TLS key if specified in client template config
+  srv_file="$OPENVPN_DIR/$(ovpn-confpath)"
+  crypto=`cat $srv_file | grep -E "^\\s*(secret|tls-auth|tls-crypt).*$" | cut -d" " -f1`
+  if [ -n "$crypto" ]; then
+    read -r -p "Add --$crypto to .ovpn? [Y/n] " response
+    if [[ ! "$response" =~ ^[Nn] ]]; then
+      if [ "$crypto" == 'tls-crypt' ]; then
+        if [ -f "$EASYRSA_PKI/ta.key" ]; then
+          $RUNCMD echo '<tls-crypt>' >> $OVPN_FILE
+          $RUNCMD cat $EASYRSA_PKI/ta.key >> $OVPN_FILE
+          $RUNCMD echo '</tls-crypt>' >> $OVPN_FILE
+        else
+          echo 'No ta.key, please add it manually via --tls-crypt or <tls-crypt></tls-crypt>'
+        fi
+      elif [ "$crypto" == 'tls-auth' ]; then
+        if [ -f "$EASYRSA_PKI/ta.key" ]; then
+          $RUNCMD echo '# Note: If this is server config replace 1 with 0' >> $OVPN_FILE
+          $RUNCMD echo 'key-direction 1' >> $OVPN_FILE
+          $RUNCMD echo '<tls-auth>' >> $OVPN_FILE
+          $RUNCMD cat $EASYRSA_PKI/ta.key >> $OVPN_FILE
+          $RUNCMD echo '</tls-auth>' >> $OVPN_FILE
+        else
+          echo 'No ta.key, please add it manually via --tls-auth or <tls-auth></tls-auth>'
+        fi
+      elif [ "$crypto" == "secret" ]; then
+        if [ -f "$EASYRSA_PKI/secret.key" ]; then
+          $RUNCMD echo '<secret>' >> $OVPN_FILE
+          $RUNCMD cat $EASYRSA_PKI/secret.key >> $OVPN_FILE
+          $RUNCMD echo '</secret>' >> $OVPN_FILE
+        else
+          echo 'No secret.key, please add it manually via --secret or <secret>...</secret>'
+        fi
+      fi
+    fi  
+  fi
+
+  echo "Generated $OVPN_FILE"
+}
+
+#
+# Generate .pkg.tar.gz file
+# @param $1 common name
+# @param $2 file (optional)
+#
+function generate_pkg() {
+  if [ $# -lt 1 ]; then
+    echo 'Invalid common name'
+    exit 1
+  fi
+
+  # Create temporary directory for building
+  TMP_DIR=/config/tmp/pkg
+  TMP_CONFIG=$TMP_DIR/openvpn/openvpn.conf
+  if [ -d "$TMP_DIR" ]; then
+    $RUNCMD rm -r $TMP_DIR
+  else
+    $RUNCMD mkdir -p $TMP_DIR
+  fi
+  
+
+  # pkg file protection
+  PKG_FILE=${2:-"/config/client-configs/$1.pkg.tar.gz"}
+  if [ -f "$PKG_FILE" ]; then
+    read -r -p "pkg already exists for $1, are you sure you want to overwrite it? [y/N] " response
+    if [[ ! "$response" =~ ^[Yy] ]]; then
+      exit 0
+    fi
+    $RUNCMD rm $PKG_FILE
+  fi
+
+  $RUNCMD mkdir -p $TMP_DIR/openvpn
+
+  # Start with client config template if it exist
+  TEMPLATE=${TEMPLATE:='openvpn-template.conf'}
+  if [ -f "$OPENVPN_DIR/$TEMPLATE" ]; then
+    $RUNCMD bash -c "cat $OPENVPN_DIR/$TEMPLATE > $TMP_CONFIG"
+  else
+    $RUNCMD touch $TMP_CONFIG
+  fi
+  echo '# Auto-generated config' >> $TMP_CONFIG
+
+  # Add CA certificate
+  if [ -f "$EASYRSA_PKI/ca.crt" ]; then
+    $RUNCMD cp $EASYRSA_PKI/ca.crt $TMP_DIR/openvpn
+    [ -n "$(grep ^\s*ca $TMP_CONFIG)" ] || $RUNCMD echo 'ca ca.crt' >> $TMP_CONFIG
+  else
+    echo 'No ca.crt added, please add it manually via --ca or <ca>...</ca>'
+  fi
+
+  # Add client's public key
+  if [ -f "$EASYRSA_PKI/issued/$1.crt" ]; then
+    $RUNCMD cp $EASYRSA_PKI/issued/$1.crt $TMP_DIR/openvpn
+    [ -n "$(grep ^\s*cert $TMP_CONFIG)" ] || $RUNCMD echo "cert $1.crt" >> $TMP_CONFIG
+  else
+    echo 'No public key added, please add it manually via --cert or <cert>...</cert>'
+  fi
+
+  # Add client's private key
+  if [ -f "$EASYRSA_PKI/private/$1.key" ]; then
+    $RUNCMD cp $EASYRSA_PKI/private/$1.key $TMP_DIR/openvpn
+    [ -n "$(grep ^\s*key $TMP_CONFIG)" ] || $RUNCMD echo "key $1.key" >> $TMP_CONFIG
+  else
+    echo 'Private key not added (sign only mode), please add it manualy via --key or <key>...</key>'
+  fi
+
+  # Add TLS key if specified in client template config
+  srv_file=$(ovpn-confpath)
+  crypto=`cat $OPENVPN_DIR/$srv_file | grep -E "^\\s*(secret|tls-auth|tls-crypt).*$" | cut -d" " -f1`
+  if [ -n "$crypto" ]; then
+    read -r -p "Add --$crypto to .ovpn? [Y/n] " response
+    if [[ ! "$response" =~ ^[Nn] ]]; then
+      if [ "$crypto" == 'tls-crypt' ]; then
+        if [ -f "$EASYRSA_PKI/ta.key" ]; then
+          $RUNCMD cp $EASYRSA_PKI/ta.key $TMP_DIR/openvpn
+          [ -n "$(grep ^\s*tls-crypt $TMP_CONFIG)" ] || $RUNCMD echo 'tls-crypt ta.key' >> $TMP_CONFIG
+        else
+          echo 'No ta.key, please add it manually via --tls-crypt or <tls-crypt></tls-crypt>'
+        fi
+      elif [ "$crypto" == 'tls-auth' ]; then
+        if [ -f "$EASYRSA_PKI/ta.key" ]; then
+          $RUNCMD cp $EASYRSA_PKI/ta.key $TMP_DIR/openvpn
+          [ -n "$(grep ^\s*tls-auth $TMP_CONFIG)" ] || $RUNCMD echo '# Note: If this is server config replace 1 with 0' >> $TMP_CONFIG
+          [ -n "$(grep ^\s*tls-auth $TMP_CONFIG)" ] || $RUNCMD echo 'tls-auth 1 ta.key' >> $TMP_CONFIG
+        else
+          echo 'No ta.key, please add it manually via --tls-auth or <tls-auth></tls-auth>'
+        fi
+      elif [ "$crypto" == "secret" ]; then
+        if [ -f "$EASYRSA_PKI/secret.key" ]; then
+          $RUNCMD cat $EASYRSA_PKI/secret.key $TMP_DIR/openvpn
+          [ -n "$(grep ^\s*secret $TMP_CONFIG)" ] || $RUNCMD echo 'secret secret.key' >> $TMP_CONFIG
+        else
+          echo 'No secret.key, please add it manually via --secret or <secret>...</secret>'
+        fi
+      fi
+    fi  
+  fi
+
+  $RUNCMD tar -C $TMP_DIR -cvzf $PKG_FILE $(ls $TMP_DIR)
+  $RUNCMD rm -r $TMP_DIR
+  echo "Generated $PKG_FILE"
+}
+
+#
+# Add subject (create certs in PKI)
+# @param $1 common name
+# @param $2 type (client|server)
+# @param $3+ easy-rsa gen-req args
+#
+function subject_add() {
+  if [ $# -lt 2 ]; then
+    echo 'Invalid arguments: COMMONNAME TYPE [EASYRSA_ARGS]'
+    echo 'Available types: client, server'
+    exit 1
+  fi
+  echo "${@:3}"
+  case "$2" in
+    client)
+      # Check if certificate already exist
+      if [ -f "$EASYRSA_PKI/issued/$1.crt" ]; then
+        echo 'Certificate with specified common name already exists'
+        exit 2
+      fi
+      # Check if signing request already exist
+      if [ -f "$EASYRSA_PKI/reqs/$1.req" ]; then
+        echo 'Signing request already exists, using existing'
+      else
+        $RUNCMD easyrsa gen-req $1 ${@:3}
+      fi
+      $RUNCMD easyrsa sign-req client $1
+      echo "Public key: $EASYRSA_PKI/issued/$1.crt"
+      echo "Private key: $EASYRSA_PKI/private/$1.key"
+
+      # Prepare .ovpn
+      read -r -p "Generate .ovpn? [y/N] " response
+      if [[ "$response" =~ (Y|y) ]]; then
+        generate_ovpn $1
+      fi
+      ;;
+    server)
+      # Check if certificate already exist
+      if [ -f "$EASYRSA_PKI/issued/$1.crt" ]; then
+        echo 'Certificate with specified common name already exists'
+        exit 2
+      fi
+      # Check if signing request already exist
+      if [ -f "$EASYRSA_PKI/reqs/$1.req" ]; then
+        echo 'Signing request already exists, using existing'
+      else
+        $RUNCMD easyrsa build-server-full $1 ${@:3}
+      fi
+      $RUNCMD easyrsa sign-req server $1
+      echo "Public key: $EASYRSA_PKI/issued/$1.crt"
+      echo "Private key: $EASYRSA_PKI/private/$1.key"
+
+      # Copy to OpenVPN
+      read -r -p "Copy server cerficate to OpenVPN (if cert is for this OpenVPN server choose yes)? [y/N] " response
+      if [[ "$response" =~ (Y|y) ]]; then
+        $RUNCMD cp $EASYRSA_PKI/issued/$1.crt $OPENVPN_DIR
+        $RUNCMD cp $EASYRSA_PKI/private/$1.key $OPENVPN_DIR
+      fi
+      ;;
+    *)
+      echo 'Invalid subject type'
+      ;;
+  esac
+}
+
+#
+# Import signing request
+# @param $1 .req file path
+#
+function subject_importreq() {
+  if [ $# -lt 1 ]; then
+    echo 'Invalid file'
+    exit 1
+  fi
+  $RUNCMD easyrsa import-req ${@:1}
+}
+
+#
+# Renew certificate
+# @param $1 common name
+# @param $2 type (client|server)
+# @param $3+ easy-rsa gen-req args
+#
+function subject_renew() {
+  if [ $# -lt 2 ]; then
+    echo 'Invalid arguments: COMMONNAME TYPE [EASYRSA_ARGS]'
+    echo 'Available types: client, server'
+    exit 1
+  fi
+
+  case "$2" in
+    client)
+      # Check if signing request already exist
+      if [ ! -f "$EASYRSA_PKI/reqs/$1.req" ]; then
+        echo 'Signing request missing'
+        exit 3
+      fi
+
+      $RUNCMD easyrsa sign-req client $1
+      echo "Public key: $EASYRSA_PKI/issued/$1.crt"
+      echo "Private key: $EASYRSA_PKI/private/$1.key"
+
+      # Prepare .ovpn
+      read -r -p "Generate .ovpn? [y/N] " response
+      if [[ "$response" =~ (Y|y) ]]; then
+        generate_ovpn $1
+      fi
+      ;;
+    server)
+      # Check if signing request already exist
+      if [ ! -f "$EASYRSA_PKI/reqs/$1.req" ]; then
+        echo 'Signing request missing'
+        exit 3
+      fi
+
+      $RUNCMD easyrsa sign-req server $1
+      echo "Public key: $EASYRSA_PKI/issued/$1.crt"
+      echo "Private key: $EASYRSA_PKI/private/$1.key"
+
+      # Copy to OpenVPN
+      read -r -p "Copy server cerficate to OpenVPN (if cert is for this OpenVPN server choose yes)? [y/N] " response
+      if [[ "$response" =~ (Y|y) ]]; then
+        $RUNCMD cp $EASYRSA_PKI/issued/$1.crt $OPENVPN_DIR
+        $RUNCMD cp $EASYRSA_PKI/private/$1.key $OPENVPN_DIR
+      fi
+      ;;
+    *)
+      echo 'Invalid subject type'
+      ;;
+  esac
+}
+
+#
+# Revoke subject
+# @param $1 common name
+#
+function subject_revoke() {
+  if [ $# -lt 1 ]; then
+    echo 'Invalid common name'
+    exit 1
+  fi
+
+  # Revoke certifcate
+  $RUNCMD easyrsa revoke $1
+
+  # Generate CRL
+  $RUNCMD easyrsa gen-crl
+  $RUNCMD cp $EASYRSA_PKI/crl.pem $OPENVPN_DIR # Relect to OpenVPN
+}
+
+
+#
+# Set client options
+# @param $1 common name
+# @param $2 option
+# @param $3+ other args
+#
+function subject_set() {
+  if [ $# -lt 3 ]; then
+    echo 'Usage: set COMMONNAME OPTION [ARGS]'
+    exit 1
+  fi
+  CONF_FILE="$OPENVPN_DIR/$(ovpn-confpath)"
+  if [ -z "$CONF_FILE" ]; then
+    echo 'No server configuration'
+    exit 1
+  fi
+  CLIENT_FILE=$OPENVPN_DIR/ccd/$1
+
+  case "$2" in
+    ip)
+      MASK="$(cat $CONF_FILE | grep -E 'server\s*[0-9\.:]+\s*[0-9\.:]+' | cut -d' ' -f 3)"
+      if [ -z "$MASK" ]; then
+        echo 'Subject mask not set in config file'
+        exit 4
+      fi
+
+      if [ -f "$CLIENT_FILE" ] && [ -n "$(grep ifconfig-push $OPENVPN_DIR/ccd/$1)" ]; then
+        $RUNCMD sed -i "/ifconfig-push\s*/s/[0-9\.:]+\s*[0-9\.:]+/$3 $MASK/" $CLIENT_FILE
+      else
+        $RUNCMD echo "ifconfig-push $3 $MASK" >> $CLIENT_FILE
+      fi
+      ;;
+    *)
+      echo 'Invalid option'
+      exit 1
+      ;;
+  esac
+
+
+}
+
+case "$command" in
+  add)
+    subject_add ${@:2}
+    ;;
+  gen-ovpn)
+    generate_ovpn ${@:2}
+    ;;
+  gen-pkg)
+    generate_pkg ${@:2}
+    ;;
+  import-req)
+    subject_importreq ${@:2}
+    ;;
+  renew)
+    subject_renew ${@:2}
+    ;;
+  revoke)
+    subject_revoke ${@:2}
+    ;;
+  set)
+    subject_set ${@:2}
+    ;;
+  *)
+    ;;
+esac

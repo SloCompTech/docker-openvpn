@@ -2,7 +2,8 @@
 # Base image
 # @see https://github.com/SloCompTech/docker-baseimage
 #
-FROM slocomptech/baseimage:alpine
+ARG FROM_SUFFIX
+FROM slocomptech/bi-python:3.8.0${FROM_SUFFIX}
 
 # Build arguments
 ARG BUILD_DATE
@@ -13,57 +14,46 @@ ARG VERSION
 # 
 # Image labels
 # @see https://github.com/opencontainers/image-spec/blob/master/annotations.md
-# @see http://label-schema.org/rc1/
 # @see https://semver.org/
 #
 LABEL org.opencontainers.image.title="OpenVPN Server" \
-      org.label-schema.name="OpenVPN Server" \
       org.opencontainers.image.description="Docker image with OpenVPN server" \
-      org.label-schema.description="Docker image with OpenVPN server" \
       org.opencontainers.image.url="https://github.com/SloCompTech/docker-openvpn" \
-      org.label-schema.url="https://github.com/SloCompTech/docker-openvpn" \
       org.opencontainers.image.authors="Martin Dagarin <martin.dagarin@gmail.com>" \
       org.opencontainers.image.version=$VERSION \
-      org.label-schema.version=$VERSION \
       org.opencontainers.image.revision=$VCS_REF \
-      org.label-schema.vcs-ref=$VCS_REF \
       org.opencontainers.image.source=$VCS_SRC \
-      org.label-schema.vcs-url=$VCS_SRC \
-      org.opencontainers.image.created=$BUILD_DATE \
-      org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.schema-version="1.0"
-
+      org.opencontainers.image.created=$BUILD_DATE
 
 #
 # Environment variables
 # @see https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md
 #
-ENV EASYRSA=/usr/share/easy-rsa \
+ENV BACKUP_DIR=/config/backup \
+    EASYRSA=/usr/share/easy-rsa \
+    EASYRSA_EXT_DIR=/config/x509-types \
     EASYRSA_PKI=/config/pki \
-    EASYRSA_VARS_FILE=/config/ssl/vars \
-    #EASYRSA_SSL_CONF=/config/ssl/openssl-easyrsa.cnf \
-    EASYRSA_SAFE_CONF=/config/ssl/safessl-easyrsa.cnf \
-    EASYRSA_TEMP_FILE=/config/tmp/temp \
-    TUNNEL_INTERFACE="tun0"
+    EASYRSA_SSL_CONF=/config/openssl-easyrsa.cnf \
+    EASYRSA_SAFE_CONF=/config/safessl-easyrsa.cnf \
+    EASYRSA_VARS_FILE=/config/vars \
+    OPENVPN_DIR=/config/openvpn
 
 # Install packages
 RUN apk add --no-cache \
-    # Core packages
-    bash \
-    easy-rsa \
-    iptables \
-    ip6tables \
-    openvpn \
-    python3 \
-    sudo && \
+      # Core packages
+      bash \
+      gettext \
+      easy-rsa \
+      iptables \
+      ip6tables \
+      nano \
+      openvpn \
+      openvpn-doc \
+      sudo && \
     # Link easy-rsa in bin directory
     ln -s ${EASYRSA}/easyrsa /usr/local/bin && \
-    # Link python3 also as python
-    ln -s /usr/bin/pip3 /usr/bin/pip && \
-    ln -s /usr/bin/python3 /usr/bin/python && \
-    # Remove any temporary files created by apk
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/* && \
-    # Add permission for network management to user abc
+    # Add permission for network management to container user
     echo "${CONTAINER_USER} ALL=(ALL) NOPASSWD: \
       /sbin/ip, \
       /sbin/ip6tables, \
@@ -83,7 +73,11 @@ RUN apk add --no-cache \
       /sbin/iptables-save, \
       /sbin/iptables-translate, \
       /sbin/route" \
-      >> /etc/sudoers.d/${CONTAINER_USER}
+      >> /etc/sudoers.d/${CONTAINER_USER} && \
+    # Default configuration
+    cp $EASYRSA/vars.example /defaults/vars && \
+    cp $EASYRSA/openssl-easyrsa.cnf /defaults && \
+    cp -r $EASYRSA/x509-types /defaults
 
 # Add repo files to image
 COPY root/ /

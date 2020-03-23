@@ -2,86 +2,59 @@
 
 This chapter shows available commands.
 
-``` bash
-$ ovpn help
+``` text
 Usage: ovpn COMMAND [ARGS..]
-
-Commands:
-  backup                                            # Creates backup of configuration files
-  client [add|ovpn|ban|revoke|remove|delete|help] [NAME] [nopass] # Client manipulation
-  disconf                                           # Deletes active config
-  enconf  EXAMPLE_CONFIG_NAME [wizard args]         # Enable example config
-  pki [init|remove|delete]                          # Public Key Intrastructure
-  restore ARCHIVE_FILE                              # Restores backup
+  Commands:
+    backup [file] # Backup config (Default location: /config/backup)
+    example [EXAMLE] # List examples or load example if name specified
+    load FILE # Load configuration (.conf, .ovpn, .pkg.tar.gz)
+    pki crl # Updates CRL'
+        init [nopass] # Inits PKI with CA (env MODULUS=... for dh.pem modulus)
+        reflect # Sync OpenVPN with PKI
+        rm|del  # Remove PKI
+    restore [file] # Restore config
+    subject add NAME {client|server} [nopass] [easy-rsa args]
+            gen-ovpn SUBNAME [file] # Generate .ovpn file
+            gen-pkg SUBNAME [file] # Generate config package
+            import-req FILE # Import signing request
+            renew SUBNAME {client|server} [easy-rsa args]
+            revoke SUBNAME
+            set SUBNAME OPTION [ARGS]
+                        ip IP # Only works on server with configured server options
 ```
 
 ## ovpn backup
 
 This command backups your configration into **.tar.gz** archive and puts it into `/config/backup` directory.
 
-### Usage
-
 ``` bash
-$ ovpn backup
+ovpn backup # Creates *.bck.tar.gz file
+ovpn backup FILE # Creates backup
 ```
 
 **Note:** Store your backups in a **SECURE** way, because they are **unencrypted**.  
 
-## ovpn client
+## ovpn example
 
-This commands manages clients of your OpenVPN server.
-
-``` bash
-$ ovpn client help
-Usage: ovpn_client COMMAND [ARGS]
-
-Commands:
-  add [NAME [nopass]]             # Creates certificates for client
-  ovpn NAME                       # Generates .ovpn file (saves to tmp)
-  revoke|ban NAME                 # Adds client to CRL
-  remove|delete NAME              # Removes client config
-```
-
-**Note:** First you need to use `add` to create client certificates, before you can use `ovpn` command.
-
-### Create .ovpn file for client
+This commands list examples or load one.
 
 ``` bash
-$ ovpn client add CLIENTNAME [nopass]
-$ ovpn client ovpn CLIENTNAME 
-# .ovpn file is saved to /config/tmp
-```
-
-## ovpn disconf
-
-This command deletes your active configuration. **Container restart** is needed for changes to take affect.
-
-```
-$ ovpn disconf
-```
-
-**NOTE:** This command does not delete PKI.
-
-## ovpn enconf
-
-This command enables OpenVPN config based on config example. If config name isn't specified it prints out config list.
-
-```
-$ ovpn enconf help
-Usage: ovpn_enconf CONFIG_NAME [wizard args...]
-
-Configs:
-  <example config name>
+ovpn example # List examples
+ovpn example EXAMPLENAME # Load example (NOTE: This overwrites existing config)
 ```
 
 **Note:** Please read example documentation to understand how to use it.
 **Warning:** Some examples automaticaly add firewall rules, so if you are using host networking make sure to check **iptables** for correct configuration.
 **Tip:** If you modifed config in a way that others might need same configuration, consider making new example.  
 
-### Enable basic config
+## openvpn load
+
+This command loads configuration.
 
 ``` bash
-$ ovpn enconf basic_nat
+ovpn load FILE.ovpn # Load .ovpn file
+ovpn load FILE.conf # Load .conf file
+ovpn load FILE.pkg.tar.gz # Load .pkg.tar.gz
 ```
 
 ## ovpn pki
@@ -89,13 +62,33 @@ $ ovpn enconf basic_nat
 This command handles PKI, which is needed for using TLS on server.
 
 ``` bash
-$ ovpn pki help
-Usage: ovpn_pki COMMAND
-
-Commands:
-  delete|remove      # Removes PKI
-  init [nopass]      # Init PKI (in /config/pki)
+ovpn pki init [nopass] # Init PKI
+ovpn pki crl # Regenerates CRL
+ovpn pki rm # Delete PKI
 ```
 
 **Note:** Best practise is to use password for your PKI. Password is only needed for signing new certificates (when adding new clients). If you don't want your PKI certificate protected with password, add `nopass` parameter.  
 **Note:** In this process you need to enter PKI password serveral times, because a lot of things are generated.
+
+## ovpn restore
+
+This command restores backup configuration
+
+``` bash
+ovpn restore # Restores latest backup from backup directory
+ovpn restore FILE
+```
+
+## ovpn subject
+
+This commands manages certificates of your OpenVPN server.
+
+``` bash
+ovpn subject add NAME client [nopass] # Create client certificate
+ovpn subject add NAME server [nopass] # Create server certificate
+ovpn subject gen-ovpn NAME # Generate .ovpn from existing cert
+ovpn subject gen-pkg NAME # Generate .pkg.tar.gz from existing cert
+ovpn subject revoke NAME # Revoke certificate
+```
+
+**Note:** First you need to use `add` to create client certificates, before you can use `ovpn` command.

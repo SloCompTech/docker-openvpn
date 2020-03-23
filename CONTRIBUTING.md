@@ -6,10 +6,9 @@ Feel free to contribute to this project.
 
 Sections:
 
-- [Example configs & hooks](root/defaults/example/README.md)
+- [Example configs & hooks](root/usr/local/share/docker-openvpn/README.md)
 - [Guides](docs/README.md)
 - [Helper Scripts](root/app/README.md)  
-- [Modules](root/defaults/module/README.md)
 
 ## Syntax
 
@@ -18,34 +17,41 @@ Sections:
 
 ## Directory structure of project
 
-```
+``` text
 /config # Configuration dir (all config is here, generated on container start)
-  backup # Folder where backups are generated
-  example # Example configs (see root/defaults/example/README.md)
-  module # Modules for openvpn
-  openvpn # Openvpn configuration
-    ccd # OpenVPN client-specific configuration directory (applied when client connects)
-    client # Client configuration directory (for generation of .ovpn files)
-      <clientconffile>.conf # Base for building client config (all files merged)
-    config # Running config (server/client)
-      <name>.conf # Config files (all files merged)
+  backup # Generated backups
+  client-configs # Generated client configs
+  hooks
+    finish # Deinit container
+    init # Init container
+  openvpn # OpenVPN directory
+    ca.crt (*) # CA public key (when pki is setup)
+    ccd # client-specific configuration directory (applied when client connects)
+    crl.pem (**) # Certificate revocation list
+    dh.pem (*) # Server crypto
+    hook.sh # Hook script runner
     hooks # Put your custom scripts in one of subfolders
-      auth # On authentication (needs to be enabled in config)
-      client-connect # Client connected
-      client-disconnect # Client disconnected
+      auth # Server: On authentication (needs to be enabled in config)
+      client-connect # Server: Client connected
+      client-disconnect # Server: Client disconnected
       down # After interface is down
-      finish # Deinit container
-      init # Init container
-      learn-address
+      ipchange # Client: our remote IP initially authenticated or changes
+      learn-address # Server: when IP, route, MAC added to OpenVPN internal routing table
       route-up # After routes are added
       route-pre-down # Before routes are removed
+      start # Before service start
+      stop # After service stop
       up # After interface is up  
       tls-verify # Check certificate
-    system.conf # System OpenVPN config file (do not edit, unless instructed)
-    system-server.conf # System OpenCPN server specific file (do not edit, unless instructed)
-    system-client.conf # System OpenCPN client specific file (do not edit, unless instructed)
-    dynamic.conf # File that links all config files together (automatically generated)
-  pki
+    include.conf # Container specific settings (must be included)
+    openvpn.conf or *.ovpn file # Main configuration file
+    openvpn-template.conf # Template configuration for creating .ovpn and .pkg
+    pid # OpenVPN PID (automatically written)
+    server.crt (*) # Server public key
+    server.key (*) # Server private key
+    tmp # Temporary directory
+  persistent-interface # Make used interface persistent
+  pki (**) # Public key infrastructure directory (KEEP IT SAFE, specialy ca.key)
     ca.crt # CA certificate
     certs by serial # Certs by Serial ID
       <serial-id-cert>.pem
@@ -61,10 +67,10 @@ Sections:
     secret.key # Static key (if not using real PKI)
     serial # The current serial number
     ta.key # Secret for tls-auth, tls-crypt
-  ssl
-    safessl-easyrsa.cnf
-    vars
-  tmp # Temporary folder
+  tmp # Temporary directory
+  openssl-easyrsa.conf
+  safessl-easyrsa.conf
+  vars
 /defaults # Default configuration, which is copied into config on full setup
   ...
 /etc # System config

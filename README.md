@@ -30,6 +30,16 @@ docker run \
   --restart=unless-stopped \
   --network host \
   slocomptech/openvpn:latest
+
+# First config command
+docker run \
+  --rm -it \
+  --cap-add NET_ADMIN \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e SKIP_APP=true \
+  -v $(pwd)/data:/config
+  slocomptech/openvpn:latest bash
 ```
 
 ### docker-compose
@@ -66,19 +76,16 @@ services:
 
 |**Parameter**|**Function**|
 |:-----------:|:----------:|
+|`-e CONFIG=test.conf`|Config file name|
 |`-e FAIL_MODE=hard`|Restart whole container on error|
-|`-e MODE=client`|Set docker mode (valid values: *empty*,server,client; default: server), set to client in case you use container as client|
-|`-e NO_CHOWN=true`|Disable permission fixing.|
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
-|`-e PERSISTENT_INTERFACE=true`|Enable persistent TUN interface|
 |`-e SKIP_APP=true`|Skip app startup|
-|`-e TUNNEL_INTERFACE="tun0"`|Tunnel interface name (default: tun0)|
-|`-e USE_FIREWALL=false`|Disable any firewall related rules to be created, modified ... (must be implemented in example)|
 |`-v /config`|All the config files including OpenVPNs reside here|
-|`-v /log`|Log files reside here|
+|`-v /log`|Directory for log files (if configured)|
 
 See also: [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)  
+See [upstream image](https://github.com/SloCompTech/docker-baseimage)
 
 ## User / Group Identifiers
 
@@ -88,33 +95,45 @@ Ensure any volume directories on the host are owned by the same user you specify
 
 In this instance `PUID=1000` and `PGID=1000`, to find yours use `id user` as below:
 
-```
-  $ id username
-    uid=1000(dockeruser) gid=1000(dockergroup) groups=1000(dockergroup)
+``` bash
+id username
+# uid=1000(dockeruser) gid=1000(dockergroup) groups=1000(dockergroup)
 ```
 
-## Application setup
+## Configuration
 
-### Initial setup
+- OpenVPN configuration is in `/config/openvpn`. Config file is `openvpn.conf` or `<anyfilename>.ovpn`.
+- Client template configuration is `openvpn-client.conf`.
+- At the top of config file you **MUST** include:
+
+  ``` conf
+  dev tun0 # You MUST set interface with name (with number !!)
+  config include.conf # Includes general config
+  config include-server.conf # Includes additional server config (only for server)
+  config unprivileged.conf # Sets OpenVPN to run unprivileged
+  ```
+
+### Server
 
 If you are new to containers please see rather [Detailed first setup guide](docs/SetupGuide.md), because it includes more detailed description.
 
 1. Init configuration directory with initial config files:
-
+  
   ``` bash
-  docker run -it --rm --cap-add NET_ADMIN -v </path/to/config>:/config slocomptech/openvpn:latest bash
+  docker run -it --rm --cap-add NET_ADMIN -e SKIP_APP=true -v </path/to/config>:/config slocomptech/openvpn:latest bash
   ```
 
-2. At this point you will have bash shell which runs in container. Now run following commands to setup your PKI:
+2. Edit `vars` file. (See [docs](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md))
+3. At this point you will have bash shell which runs in container. Now run following commands to setup your PKI:
 
   ``` bash
   ovpn pki init [nopass] # Inits PKI
   ```
 
-3. Setup OpenVPN config based on example `basic_nat` with configuration wizard:  
+4. Setup OpenVPN config based on example `basic` with configuration wizard or put your config in `/config/openvpn/openvpn.conf`:  
 
   ``` bash
-  ovpn enconf basic_nat
+  ovpn example basic
   #Out interface [eth0]: <interface connected to the Internet>
   #Protocol udp, tcp, udp6, tcp6 [udp]:
   #VPN network [10.0.0.0]:
@@ -124,22 +143,19 @@ If you are new to containers please see rather [Detailed first setup guide](docs
   #DNS2 [8.8.4.4]:
   ```
 
-4. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
-5. Add clients
+5. Generate server certificate `ovpn subject add server server [nopass]`.
+6. Enable **port forwarding** on your router so OpenVPN server will be accessible from the internet.
+7. Add clients
 
   ``` bash
-  # Generates client certificates
-  ovpn client add <name> [nopass]
-
-  # Generates client config file and saves it to /config/tmp
-  ovpn client ovpn <name>
-
-  # OR BETTER SOLLUTION: Run outside container
-  docker exec -it <container name> ovpn client ovpnp <name> > <config file>.ovpn
+  # Generates client certificates (put in client-confs directory)
+  ovpn subject add <name> [nopass]
+  # Generate .ovpn manually (generated in client-configs)
+  ovpn subject gen-ovpn <name>
   ```
 
-5. Exit container with `exit`, then it will destroy itself.
-6. Start container using command specified in *Usage* section.
+8. Exit container with `exit`, then it will destroy itself.
+9. Start container using command specified in *Usage* section.
 
 For more infromation see:
 
@@ -148,16 +164,15 @@ For more infromation see:
 - **configuration example directory** (for more info about example)  
 - [Contributing](CONTRIBUTING.md) (for explanation how container works, how to write an example config ...)  
 
-### Client mode
+**Note:** OpenVPN documentation is located at `/usr/share/doc/openvpn`.
+
+### Client
 
 1. Run container to get config structure `docker run -it --rm -v PATH:/config slocomptech/openvpn`.
-2. Make sure you **don't** have following options specified in your *.ovpn* file
-  -  dev
-  - user
-  - group
-  - anything that is already specified in *system.conf*
-3. Put *.ovpn* file in `config/openvpn/config` in your volume.
-4. Start conatiner with `-e MODE=client`. 
+2. Make sure you **don't** have following options specified in your config file
+    - user
+    - group
+3. Put config file in `/config/openvpn`.
 
 ## Troubleshooting
 
@@ -173,13 +188,6 @@ Feel free to contribute new features to this container, but first see [Contribut
 
 ## TODO
 
-Planed features:
-
-Wanted features (please help implement):
-
-- LDAP authentication script
-- Google authenticator
-
 ## Licenses
 
 - [This project](LICENSE.md)  
@@ -190,3 +198,12 @@ Wanted features (please help implement):
 ## Versions
 
 See [CHANGELOG](CHANGELOG.md)
+
+## External documentation
+
+- [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Readme.md)
+- [EasyRSA vars](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)
+- [OpenVPN](https://community.openvpn.net/openvpn/wiki/Openvpn24ManPage)
+- [OpenVPN getting started](https://community.openvpn.net/openvpn/wiki/GettingStartedwithOVPN)
+- [OpenVPN how to](https://openvpn.net/community-resources/how-to/)
+- [s6](https://skarnet.org/software/s6)

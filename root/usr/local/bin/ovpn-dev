@@ -1,0 +1,12 @@
+#!/usr/bin/with-contenv bash
+#
+# Prints OpenVPN device
+#
+
+config=$(ovpn-confpath)
+if [ -z "$config" ]; then
+  exit 0
+fi
+
+device="$(cat $OPENVPN_DIR/$config | sed -n -re 's/^\s*dev\s*(\w+)\s*$/\1/p')"
+echo "$device"

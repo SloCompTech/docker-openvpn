@@ -1,9 +1,17 @@
 #!/usr/bin/with-contenv bash
-
 #
-#   Runs custom init scripts in /config/hooks/init
+#   Runs custom init scripts
 #
+set -e
 
-run_hooks init
+# Global
+for script in /config/hooks/init/*
+do
+  # Skip non-files and non-executables
+  if [ ! -f "$script" ] || [ ! -x "$script" ]; then
+    continue
+  fi
 
-exit $?
+  # Run script
+  $script
+done

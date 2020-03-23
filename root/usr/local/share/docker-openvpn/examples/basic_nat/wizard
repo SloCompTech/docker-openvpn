@@ -1,0 +1,53 @@
+#!/usr/bin/with-contenv bash
+#
+# Config wizard for basic_nat example
+# @author Martin Dagarin
+# @version 2
+# @since 22/03/2020
+#
+
+if [ -z "$1" ]; then
+  echo 'Directory path missing'
+  exit 1
+fi
+
+read -p 'Out interface [eth0]: ' outint
+outint=${outint:='eth0'}
+
+read -p 'Protocol udp, tcp, udp6, tcp6 [udp]: ' protocol
+protocol=${protocol:=udp}
+
+read -p 'Port [1194]: ' port
+port=${port:=1194}
+
+read -p 'Public IP: ' public_ip
+if [ -z "$public_ip" ]; then echo 'Invalid IP'; exit 2; fi
+
+read -p 'VPN network [10.8.0.0]: ' network
+network=${network:='10.8.0.0'}
+
+read -p 'DNS1 [1.1.1.1]: ' dns1
+dns1=${dns1:='1.1.1.1'}
+
+read -p 'DNS2 [8.8.8.8]: ' dns2
+dns2=${dns2:='8.8.8.8'}
+
+confs=(
+  "$1/config/openvpn/openvpn.conf"
+  "$1/config/openvpn/openvpn-template.conf"
+  "$1/config/openvpn/hooks/down/10-network.sh"
+  "$1/config/openvpn/hooks/up/10-network.sh"
+)
+
+for file in "${confs[@]}"
+do
+  mv $file $file.old
+  OUT_INT="$outint" \
+  PROTO="$protocol" \
+  PORT="$port" \
+  SERVER_IP="$public_ip" \
+  NETWORK_ADDRESS="$network" \
+  DNS1="$dns1" \
+  DNS2="$dns2" \
+  envsubst < $file.old > $file
+done

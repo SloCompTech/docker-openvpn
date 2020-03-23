@@ -12,10 +12,10 @@ if [ -z "$1" ]; then
 fi
 
 read -p 'Protocol udp, tcp, udp6, tcp6 [udp]: ' protocol
-protocol=${protocol:=udp}
+protocol=${protocol:-udp}
 
 read -p 'Port [1194]: ' port
-port=${port:=1194}
+port=${port:-1194}
 
 read -p 'Site A public IP: ' remote_a
 if [ -z "$remote_a" ]; then echo 'Invalid IP'; exit 2; fi

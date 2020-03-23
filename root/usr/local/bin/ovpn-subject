@@ -36,7 +36,7 @@ function generate_ovpn() {
   fi
 
   # Start with client config template if it exist
-  TEMPLATE=${TEMPLATE:='openvpn-template.conf'}
+  TEMPLATE=${TEMPLATE:-'openvpn-template.conf'}
   if [ -f "$OPENVPN_DIR/$TEMPLATE" ]; then
     $RUNCMD bash -c "cat $OPENVPN_DIR/$TEMPLATE > $OVPN_FILE"
   else
@@ -143,7 +143,7 @@ function generate_pkg() {
   $RUNCMD mkdir -p $TMP_DIR/openvpn
 
   # Start with client config template if it exist
-  TEMPLATE=${TEMPLATE:='openvpn-template.conf'}
+  TEMPLATE=${TEMPLATE:-'openvpn-template.conf'}
   if [ -f "$OPENVPN_DIR/$TEMPLATE" ]; then
     $RUNCMD bash -c "cat $OPENVPN_DIR/$TEMPLATE > $TMP_CONFIG"
   else

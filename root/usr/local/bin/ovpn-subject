@@ -19,7 +19,7 @@ fi
 # @param $1 common name
 # @param $2 file (optional)
 #
-function generate_ovpn() {
+function generate_ovpn {
   if [ $# -lt 1 ]; then
     echo 'Invalid common name'
     exit 1
@@ -114,7 +114,7 @@ function generate_ovpn() {
 # @param $1 common name
 # @param $2 file (optional)
 #
-function generate_pkg() {
+function generate_pkg {
   if [ $# -lt 1 ]; then
     echo 'Invalid common name'
     exit 1
@@ -218,7 +218,7 @@ function generate_pkg() {
 # @param $2 type (client|server)
 # @param $3+ easy-rsa gen-req args
 #
-function subject_add() {
+function subject_add {
   if [ $# -lt 2 ]; then
     echo 'Invalid arguments: COMMONNAME TYPE [EASYRSA_ARGS]'
     echo 'Available types: client, server'
@@ -281,7 +281,7 @@ function subject_add() {
 # Import signing request
 # @param $1 .req file path
 #
-function subject_importreq() {
+function subject_importreq {
   if [ $# -lt 1 ]; then
     echo 'Invalid file'
     exit 1
@@ -295,7 +295,7 @@ function subject_importreq() {
 # @param $2 type (client|server)
 # @param $3+ easy-rsa gen-req args
 #
-function subject_renew() {
+function subject_renew {
   if [ $# -lt 2 ]; then
     echo 'Invalid arguments: COMMONNAME TYPE [EASYRSA_ARGS]'
     echo 'Available types: client, server'
@@ -348,7 +348,7 @@ function subject_renew() {
 # Revoke subject
 # @param $1 common name
 #
-function subject_revoke() {
+function subject_revoke {
   if [ $# -lt 1 ]; then
     echo 'Invalid common name'
     exit 1
@@ -369,7 +369,7 @@ function subject_revoke() {
 # @param $2 option
 # @param $3+ other args
 #
-function subject_set() {
+function subject_set {
   if [ $# -lt 3 ]; then
     echo 'Usage: set COMMONNAME OPTION [ARGS]'
     exit 1

@@ -21,7 +21,7 @@ read -p 'Port [1194]: ' port
 port=${port:-1194}
 
 read -p 'Public IP: ' public_ip
-if [ -z "$public_ip" ]; then echo 'Invalid IP'; exit 2; fi
+[ -z "$public_ip" ] && { echo 'Invalid IP'; exit 2; }
 
 read -p 'VPN network [10.8.0.0]: ' network
 network=${network:-'10.8.0.0'}

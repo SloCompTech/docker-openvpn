@@ -10,7 +10,7 @@ source $CONTAINER_VARS_FILE
 command="$(echo $1 | tr '[:upper:]' '[:lower:]')"
 
 # Generate CA certificate
-function generate_ca() {
+function generate_ca {
   echo 'Now it will build CA files for issuing new certifiactes'
   echo 'Please protect ca.key with secure password (used for signing new certs)'
   echo 'ca.key is needed only for signing new certificates, not for OpenVPN to work'
@@ -19,7 +19,7 @@ function generate_ca() {
 }
 
 # Generate CRL
-function generate_crl() {
+function generate_crl {
   if [ ! -d "$EASYRSA_PKI" ]; then
     exit 0
   fi
@@ -29,13 +29,13 @@ function generate_crl() {
 }
 
 # Generate dh.pem
-function generate_dh() {
+function generate_dh {
   $RUNCMD easyrsa gen-dh ${@:1}
   $RUNCMD cp $EASYRSA_PKI/dh.pem $OPENVPN_DIR # Relect to OpenVPN
 }
 
 # Generate ta.key
-function generate_ta() {
+function generate_ta {
   $RUNCMD openvpn --genkey --secret $EASYRSA_PKI/ta.key
   $RUNCMD cp $EASYRSA_PKI/ta.key $OPENVPN_DIR # Relect to OpenVPN
 }
@@ -43,7 +43,7 @@ function generate_ta() {
 #
 # Delete PKI
 #
-function pki_delete() {
+function pki_delete {
   # Check if PKI directory exists
   if [ ! -d "$EASYRSA_PKI" ]; then
     echo 'PKI does not exist'
@@ -63,7 +63,7 @@ function pki_delete() {
 #
 # Init PKI
 #
-function pki_init() {
+function pki_init {
   # Check if PKI directory exists
   if [ -d "$EASYRSA_PKI" ]; then
     read -r -p 'PKI already exist, reconfigure? [y/N] ' response
@@ -122,7 +122,7 @@ function pki_init() {
 #
 # Reflect PKI files into OpenVPN directory
 #
-function pki_reflect() {
+function pki_reflect {
   if [ ! -d "$EASYRSA_PKI" ]; then
     exit 0
   fi

@@ -5,7 +5,7 @@
 
 set -e
 
-function usage() {
+function usage {
   echo 'Usage: ovpn COMMAND [ARGS..]'
   echo ''
   echo 'Commands:'

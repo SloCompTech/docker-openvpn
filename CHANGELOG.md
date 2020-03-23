@@ -1,5 +1,9 @@
 # Changelog
 
+### 3.0.3 - Fixed syntax
+
+- Fixed bash scripts syntax
+
 ### 3.0.0 - New major release
 
 - Changed fs structure

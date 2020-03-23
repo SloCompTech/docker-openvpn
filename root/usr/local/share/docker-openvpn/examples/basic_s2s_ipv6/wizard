@@ -18,22 +18,22 @@ read -p 'Port [1194]: ' port
 port=${port:-1194}
 
 read -p 'Site A public IP: ' remote_a
-if [ -z "$remote_a" ]; then echo 'Invalid IP'; exit 2; fi
+[ -z "$remote_a" ] && { echo 'Invalid IP'; exit 2; }
 
 read -p 'Site A tunnel IP: ' ip_a
-if [ -z "$ip_a" ]; then echo 'Invalid IP'; exit 2; fi
+[ -z "$ip_a" ] && { echo 'Invalid IP'; exit 2; }
 
 read -p 'Site A tunnel IPv6: ' ip6_a
-if [ -z "$ip6_a" ]; then echo 'Invalid IPv6'; exit 2; fi
+[ -z "$ip6_a" ] && { echo 'Invalid IP'; exit 2; }
 
 read -p 'Site B public IP: ' remote_b
-if [ -z "$remote_b" ]; then echo 'Invalid IP'; exit 2; fi
+[ -z "$remote_b" ] && { echo 'Invalid IP'; exit 2; }
 
 read -p 'Site B tunnel IP: ' ip_b
-if [ -z "$ip_b" ]; then echo 'Invalid IP'; exit 2; fi
+[ -z "$ip_b" ] && { echo 'Invalid IP'; exit 2; }
 
 read -p 'Site B tunnel IPv6: ' ip6_b
-if [ -z "$ip6_b" ]; then echo 'Invalid IPv6'; exit 2; fi
+[ -z "$ip6_b" ] && { echo 'Invalid IP'; exit 2; }
 
 confs=(
   "$1/config/openvpn/openvpn.conf"

@@ -3,7 +3,7 @@
 # Cron
 #
 
-if [ -z "$USE_CRON" ]; then
+if [ -n "$NO_CRON" ]; then
   exit 0
 fi
 

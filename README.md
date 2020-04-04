@@ -25,6 +25,7 @@ docker run \
   --cap-add NET_ADMIN \
   -e PUID=1000 \
   -e PGID=1000 \
+  -e USE_CRON=true \
   -p 1194:1194/udp \
   -v </path/o/config>:/config \
   --restart=unless-stopped \
@@ -60,6 +61,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - USE_CRON=true
     restart: on-failure
     # If you want to build from source add build:
     build:
@@ -82,6 +84,7 @@ services:
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-e SKIP_APP=true`|Skip app startup|
+|`-e USE_CRON=true`|Enable Cron for CRL update ...|
 |`-v /config`|All the config files including OpenVPNs reside here|
 |`-v /log`|Directory for log files (if configured)|
 

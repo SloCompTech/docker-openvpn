@@ -3,4 +3,8 @@
 # Cron
 #
 
+if [ -z "$USE_CRON" ]; then
+  exit 0
+fi
+
 crond -f

@@ -1,0 +1,10 @@
+#!/usr/bin/with-contenv bash
+#
+# Cron
+#
+
+if [ -n "$NO_CRON" ]; then
+  exit 0
+fi
+
+crond -f

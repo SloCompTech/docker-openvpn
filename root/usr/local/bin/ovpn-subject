@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/bin/bash
 #
 # Subject utility script
 #
@@ -129,7 +129,6 @@ function generate_pkg {
     $RUNCMD mkdir -p $TMP_DIR
   fi
   
-
   # pkg file protection
   PKG_FILE=${2:-"/config/client-configs/$1.pkg.tar.gz"}
   if [ -f "$PKG_FILE" ]; then
@@ -142,19 +141,30 @@ function generate_pkg {
 
   $RUNCMD mkdir -p $TMP_DIR/openvpn
 
-  # Start with client config template if it exist
-  TEMPLATE=${TEMPLATE:-'openvpn-template.conf'}
-  if [ -f "$OPENVPN_DIR/$TEMPLATE" ]; then
-    $RUNCMD bash -c "cat $OPENVPN_DIR/$TEMPLATE > $TMP_CONFIG"
-  else
-    $RUNCMD touch $TMP_CONFIG
+  # Template
+  read -r -p "Include template file? [Y/n]: " response
+  INCLUDE_TEMPLATE="yes"
+  if [[ "$response" =~ ^[Nn] ]]; then
+    INCLUDE_TEMPLATE=""
   fi
-  echo '# Auto-generated config' >> $TMP_CONFIG
+
+  if [ -n "$INCLUDE_TEMPLATE" ]; then
+    # Start with client config template if it exist
+    TEMPLATE=${TEMPLATE:-'openvpn-template.conf'}
+    echo "$TEMPLATE"
+    echo "Test"
+    if [ -f "$OPENVPN_DIR/$TEMPLATE" ]; then
+      $RUNCMD bash -c "cat $OPENVPN_DIR/$TEMPLATE > $TMP_CONFIG"
+    else
+      $RUNCMD touch $TMP_CONFIG
+    fi
+    echo '# Auto-generated config' >> $TMP_CONFIG
+  fi
 
   # Add CA certificate
   if [ -f "$EASYRSA_PKI/ca.crt" ]; then
     $RUNCMD cp $EASYRSA_PKI/ca.crt $TMP_DIR/openvpn
-    [ -n "$(grep ^\s*ca $TMP_CONFIG)" ] || $RUNCMD echo 'ca ca.crt' >> $TMP_CONFIG
+    [ -z "$INCLUDE_TEMPLATE" ] || [ -n "$(grep ^\s*ca $TMP_CONFIG)" ] || $RUNCMD echo 'ca ca.crt' >> $TMP_CONFIG
   else
     echo 'No ca.crt added, please add it manually via --ca or <ca>...</ca>'
   fi
@@ -162,7 +172,7 @@ function generate_pkg {
   # Add client's public key
   if [ -f "$EASYRSA_PKI/issued/$1.crt" ]; then
     $RUNCMD cp $EASYRSA_PKI/issued/$1.crt $TMP_DIR/openvpn
-    [ -n "$(grep ^\s*cert $TMP_CONFIG)" ] || $RUNCMD echo "cert $1.crt" >> $TMP_CONFIG
+    [ -z "$INCLUDE_TEMPLATE" ] || [ -n "$(grep ^\s*cert $TMP_CONFIG)" ] || $RUNCMD echo "cert $1.crt" >> $TMP_CONFIG
   else
     echo 'No public key added, please add it manually via --cert or <cert>...</cert>'
   fi
@@ -170,41 +180,48 @@ function generate_pkg {
   # Add client's private key
   if [ -f "$EASYRSA_PKI/private/$1.key" ]; then
     $RUNCMD cp $EASYRSA_PKI/private/$1.key $TMP_DIR/openvpn
-    [ -n "$(grep ^\s*key $TMP_CONFIG)" ] || $RUNCMD echo "key $1.key" >> $TMP_CONFIG
+    [ -z "$INCLUDE_TEMPLATE" ] || [ -n "$(grep ^\s*key $TMP_CONFIG)" ] || $RUNCMD echo "key $1.key" >> $TMP_CONFIG
   else
     echo 'Private key not added (sign only mode), please add it manualy via --key or <key>...</key>'
   fi
 
-  # Add TLS key if specified in client template config
-  srv_file=$(ovpn-confpath)
-  crypto=`cat $OPENVPN_DIR/$srv_file | grep -E "^\\s*(secret|tls-auth|tls-crypt).*$" | cut -d" " -f1`
-  if [ -n "$crypto" ]; then
-    read -r -p "Add --$crypto to .ovpn? [Y/n] " response
-    if [[ ! "$response" =~ ^[Nn] ]]; then
-      if [ "$crypto" == 'tls-crypt' ]; then
-        if [ -f "$EASYRSA_PKI/ta.key" ]; then
-          $RUNCMD cp $EASYRSA_PKI/ta.key $TMP_DIR/openvpn
-          [ -n "$(grep ^\s*tls-crypt $TMP_CONFIG)" ] || $RUNCMD echo 'tls-crypt ta.key' >> $TMP_CONFIG
-        else
-          echo 'No ta.key, please add it manually via --tls-crypt or <tls-crypt></tls-crypt>'
-        fi
-      elif [ "$crypto" == 'tls-auth' ]; then
-        if [ -f "$EASYRSA_PKI/ta.key" ]; then
-          $RUNCMD cp $EASYRSA_PKI/ta.key $TMP_DIR/openvpn
-          [ -n "$(grep ^\s*tls-auth $TMP_CONFIG)" ] || $RUNCMD echo '# Note: If this is server config replace 1 with 0' >> $TMP_CONFIG
-          [ -n "$(grep ^\s*tls-auth $TMP_CONFIG)" ] || $RUNCMD echo 'tls-auth 1 ta.key' >> $TMP_CONFIG
-        else
-          echo 'No ta.key, please add it manually via --tls-auth or <tls-auth></tls-auth>'
-        fi
-      elif [ "$crypto" == "secret" ]; then
-        if [ -f "$EASYRSA_PKI/secret.key" ]; then
-          $RUNCMD cat $EASYRSA_PKI/secret.key $TMP_DIR/openvpn
-          [ -n "$(grep ^\s*secret $TMP_CONFIG)" ] || $RUNCMD echo 'secret secret.key' >> $TMP_CONFIG
-        else
-          echo 'No secret.key, please add it manually via --secret or <secret>...</secret>'
+  # Add TLS key
+  if [ -f "$EASYRSA_PKI/ta.key" ]; then
+    $RUNCMD cp $EASYRSA_PKI/ta.key $TMP_DIR/openvpn
+  fi
+  if [ -f "$EASYRSA_PKI/secret.key" ]; then
+    $RUNCMD cp $EASYRSA_PKI/secret.key $TMP_DIR/openvpn
+  fi
+
+  # Add TLS to config
+  srv_file="$(ovpn-confpath)"
+  if [ -n "$srv_file" ] && [ -n "$INCLUDE_TEMPLATE" ]; then
+    crypto=`cat $OPENVPN_DIR/$srv_file | grep -E "^\\s*(secret|tls-auth|tls-crypt).*$" | cut -d" " -f1`
+    if [ -n "$crypto" ]; then
+      read -r -p "Add --$crypto to .ovpn? [Y/n] " response
+      if [[ ! "$response" =~ ^[Nn] ]]; then
+        if [ "$crypto" == 'tls-crypt' ]; then
+          if [ -f "$EASYRSA_PKI/ta.key" ]; then
+            [ -n "$(grep ^\s*tls-crypt $TMP_CONFIG)" ] || $RUNCMD echo 'tls-crypt ta.key' >> $TMP_CONFIG
+          else
+            echo 'No ta.key, please add it manually via --tls-crypt or <tls-crypt></tls-crypt>'
+          fi
+        elif [ "$crypto" == 'tls-auth' ]; then
+          if [ -f "$EASYRSA_PKI/ta.key" ]; then
+            [ -n "$(grep ^\s*tls-auth $TMP_CONFIG)" ] || $RUNCMD echo '# Note: If this is server config replace 1 with 0' >> $TMP_CONFIG
+            [ -n "$(grep ^\s*tls-auth $TMP_CONFIG)" ] || $RUNCMD echo 'tls-auth 1 ta.key' >> $TMP_CONFIG
+          else
+            echo 'No ta.key, please add it manually via --tls-auth or <tls-auth></tls-auth>'
+          fi
+        elif [ "$crypto" == "secret" ]; then
+          if [ -f "$EASYRSA_PKI/secret.key" ]; then
+            [ -n "$(grep ^\s*secret $TMP_CONFIG)" ] || $RUNCMD echo 'secret secret.key' >> $TMP_CONFIG
+          else
+            echo 'No secret.key, please add it manually via --secret or <secret>...</secret>'
+          fi
         fi
       fi
-    fi  
+    fi
   fi
 
   $RUNCMD tar -C $TMP_DIR -cvzf $PKG_FILE $(ls $TMP_DIR)

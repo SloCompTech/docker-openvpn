@@ -2,4 +2,5 @@
 #
 # CRL update
 #
-ovpn pki crl
+
+[ -n "$NO_CRL_UPDATE" ] || [ ! -d "$EASYRSA_PKI" ] || ovpn pki crl

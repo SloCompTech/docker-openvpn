@@ -78,6 +78,8 @@ services:
 |:-----------:|:----------:|
 |`-e CONFIG=test.conf`|Config file name|
 |`-e FAIL_MODE=hard`|Restart whole container on error|
+|`-e NO_CRL_UPDATE=true`|Disable auto CRL update (used when CA is password protected)|
+|`-e NO_CRON=true`|Disable Cron for CRL update ...|
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-e SKIP_APP=true`|Skip app startup|
@@ -203,6 +205,7 @@ See [CHANGELOG](CHANGELOG.md)
 
 - [EasyRSA](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Readme.md)
 - [EasyRSA vars](https://github.com/OpenVPN/easy-rsa/blob/master/doc/EasyRSA-Advanced.md)
+- [EasyRSA password scripting](https://stackoverflow.com/questions/22415601/using-easy-rsa-how-to-automate-client-server-creation-process)
 - [OpenVPN](https://community.openvpn.net/openvpn/wiki/Openvpn24ManPage)
 - [OpenVPN getting started](https://community.openvpn.net/openvpn/wiki/GettingStartedwithOVPN)
 - [OpenVPN how to](https://openvpn.net/community-resources/how-to/)

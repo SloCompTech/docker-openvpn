@@ -1,5 +1,11 @@
 # Changelog
 
+### 3.0.4 - Major fixes
+
+- Fixed bash running environment for script
+- Fixed CRL updating with cron
+- Added option to exclude configuration on pkg generation
+
 ### 3.0.3 - Fixed syntax
 
 - Fixed bash scripts syntax

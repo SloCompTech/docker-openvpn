@@ -1,5 +1,9 @@
 # Changelog
 
+### 3.0.5 - New base image
+
+- Updated to new base image
+
 ### 3.0.4 - Major fixes
 
 - Fixed bash running environment for script

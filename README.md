@@ -80,6 +80,7 @@ services:
 |`-e FAIL_MODE=hard`|Restart whole container on error|
 |`-e NO_CRL_UPDATE=true`|Disable auto CRL update (used when CA is password protected)|
 |`-e NO_CRON=true`|Disable Cron for CRL update ...|
+|`-e PERSIST_INTERFACE=true`|Persist tunnel interface|
 |`-e PUID=1000`|for UserID - see below for explanation|
 |`-e PGID=1000`|for GroupID - see below for explanation|
 |`-e SKIP_APP=true`|Skip app startup|

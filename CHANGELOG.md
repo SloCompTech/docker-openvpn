@@ -1,5 +1,9 @@
 # Changelog
 
+### 3.0.6 - Persistent interface
+
+- Added persistent interface variable
+
 ### 3.0.5 - New base image
 
 - Updated to new base image

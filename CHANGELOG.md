@@ -1,5 +1,9 @@
 # Changelog
 
+### 3.0.7 - Added missing config
+
+- Added ccd,tmp-dir config to include-server
+
 ### 3.0.6 - Persistent interface
 
 - Added persistent interface variable

@@ -3,6 +3,7 @@
 ### 3.0.8 - Bugfixes
 
 - Setup tunnel device regardles of `SKIP_APP` so you can use `openvpn --rmtun`
+- Improved examples
 
 ### 3.0.7 - Added missing config
 

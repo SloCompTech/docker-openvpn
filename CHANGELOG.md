@@ -1,5 +1,9 @@
 # Changelog
 
+### 3.0.8 - Bugfixes
+
+- Setup tunnel device regardles of `SKIP_APP` so you can use `openvpn --rmtun`
+
 ### 3.0.7 - Added missing config
 
 - Added ccd,tmp-dir config to include-server

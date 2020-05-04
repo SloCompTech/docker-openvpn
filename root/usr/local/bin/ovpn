@@ -17,7 +17,7 @@ function usage {
   echo '      reflect # Sync OpenVPN with PKI'
   echo '      rm|del  # Remove PKI'
   echo '  restore [file] # Restore config'
-  echo '  subject add NAME {client|server} [nopass] [easy-rsa args]'
+  echo '  subject add NAME {client|server|serverClient} [nopass] [easy-rsa args]'
   echo '          gen-ovpn SUBNAME [file] # Generate .ovpn file (TEMPLATE=<custom template in openvpn dir)'
   echo '          gen-pkg SUBNAME [file] # Generate config package (TEMPLATE=<custom template in openvpn dir)'
   echo '          import-req FILE # Import signing request'

@@ -53,7 +53,10 @@ RUN apk add --no-cache \
     ln -s ${EASYRSA}/easyrsa /usr/local/bin && \
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/* /var/cache/distfiles/* && \
     # Add permission for network management to container user
-    echo "${CONTAINER_USER} ALL=(ALL) NOPASSWD: \
+    echo "${CONTAINER_USER} ALL=(ALL) NOPASSWD:SETENV: \
+      /bin/*, \
+      /usr/bin/*, \
+      /usr/local/bin/*, \
       /sbin/ip, \
       /sbin/ip6tables, \
       /sbin/ip6tables-compat, \

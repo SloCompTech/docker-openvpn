@@ -6,6 +6,9 @@
 # @since 22/03/2020
 #
 
+set -e
+source $CONTAINER_VARS_FILE
+
 if [ -z "$1" ]; then
   echo 'Directory path missing'
   exit 1
@@ -39,7 +42,7 @@ confs=(
 
 for file in "${confs[@]}"
 do
-  mv $file $file.old
+  $RUNCMD mv $file $file.old
   PROTO="$protocol" \
   PORT="$port" \
   SERVER_IP="$public_ip" \
@@ -47,5 +50,6 @@ do
   NETWORK_ADDRESS_IPV6="$network6" \
   DNS1="$dns1" \
   DNS2="$dns2" \
-  envsubst < $file.old > $file
+  $RUNCMD envsubst < $file.old > $file
+  $RUNCMD rm $file.old
 done

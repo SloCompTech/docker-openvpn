@@ -1,5 +1,9 @@
 # Changelog
 
+### 3.0.9 - Fix
+
+- Fixed `ovpn subject add` to accept all types inside `x509-types` (note: server types must start with server)
+
 ### 3.0.8 - Bugfixes
 
 - Setup tunnel device regardles of `SKIP_APP` so you can use `openvpn --rmtun`

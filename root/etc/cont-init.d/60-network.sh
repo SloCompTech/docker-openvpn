@@ -10,10 +10,6 @@
 #	@see https://github.com/kylemanna/docker-openvpn/issues/39
 #
 
-if [ -n "$SKIP_APP" ]; then
-  exit 0
-fi
-
 if [ ! -d "/dev/net" ]; then
 	echo "Creating /dev/net"
 	mkdir -p /dev/net
@@ -22,6 +18,10 @@ fi
 if [ ! -c "/dev/net/tun" ]; then
 	mknod /dev/net/tun c 10 200
 	chmod 666 /dev/net/tun
+fi
+
+if [ -n "$SKIP_APP" ]; then
+  exit 0
 fi
 
 config="$(ovpn-confpath)"

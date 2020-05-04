@@ -12,6 +12,15 @@ if [ -z "$1" ] || [ ! -d "$example_dir" ]; then
   ls -1 /usr/local/share/docker-openvpn/examples
   exit 0
 else
+  # If current configuration exists, move it to .old
+  config="$(ovpn-confpath)"
+  if [ -n "$OPENVPN_DIR/$config" ] && [ -f "$OPENVPN_DIR/$config" ]; then
+    $RUNCMD mv $OPENVPN_DIR/$config $OPENVPN_DIR/$config.old
+  fi
+  if [ -f "$OPENVPN_DIR/openvpn-template.conf" ]; then
+    $RUNCMD mv $OPENVPN_DIR/openvpn-template.conf $OPENVPN_DIR/openvpn-template.conf.old
+  fi
+
   if [ -f "$example_dir/wizard" ] && [ -x "$example_dir/wizard" ]; then
     $RUNCMD mkdir -p /config/tmp/wizard
     $RUNCMD cp -r /usr/local/share/docker-openvpn/examples/$1/* /config/tmp/wizard

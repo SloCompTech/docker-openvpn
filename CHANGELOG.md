@@ -1,5 +1,9 @@
 # Changelog
 
+### 3.1.0 - Bugfix
+
+- Fixed hooks bug (environement variables inaccesible)
+
 ### 3.0.9 - Fix
 
 - Fixed `ovpn subject add` to accept all types inside `x509-types` (note: server types must start with server)

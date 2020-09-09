@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/bin/bash
 #
 # Hook script runner for OpenVPN
 #
@@ -23,6 +23,7 @@ do
   exit_status=$?
   if [ $exit_status -ne 0 ]; then
     # Script returned non 0 exit code
+    echo "Script $script exited with status $exit_status"
     exit $exit_status
   fi
 done
